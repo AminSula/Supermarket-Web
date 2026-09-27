@@ -1,0 +1,52 @@
+<section class="category-list">
+  <div class="header">
+    <h1>{{ 'admin.categories.title' | translate }}</h1>
+    <a routerLink="/admin/categories/new" class="btn">{{ 'admin.categories.add' | translate }}</a>
+  </div>
+
+  @if (loading()) {
+    <p>{{ 'admin.categories.loading' | translate }}</p>
+  } @else if (categories().length === 0) {
+    <p>{{ 'admin.categories.empty' | translate }}</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>{{ 'admin.categories.nameAl' | translate }}</th>
+          <th>{{ 'admin.categories.nameEn' | translate }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (category of categories(); track category.id) {
+          <tr>
+            <td>{{ nameFor(category, 'AL') }}</td>
+            <td>{{ nameFor(category, 'EN') }}</td>
+            <td class="actions">
+              <a [routerLink]="['/admin/categories', category.id, 'edit']">
+                {{ 'admin.categories.edit' | translate }}
+              </a>
+              <button type="button" (click)="askDelete(category.id)">
+                {{ 'admin.categories.delete' | translate }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+</section>
+
+<app-confirm-dialog
+  [open]="pendingDeleteId() !== null"
+  [title]="'admin.categories.deleteTitle' | translate"
+  [message]="'admin.categories.deleteMessage' | translate"
+  [confirmLabel]="'admin.categories.delete' | translate"
+  [cancelLabel]="'common.cancel' | translate"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

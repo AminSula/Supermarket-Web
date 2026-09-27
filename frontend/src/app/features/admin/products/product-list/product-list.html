@@ -1,0 +1,60 @@
+<section class="product-list">
+  <div class="header">
+    <h1>{{ 'admin.products.title' | translate }}</h1>
+    <a routerLink="/admin/products/new" class="btn">{{ 'admin.products.add' | translate }}</a>
+  </div>
+
+  @if (loading()) {
+    <p>{{ 'admin.products.loading' | translate }}</p>
+  } @else if (products().length === 0) {
+    <p>{{ 'admin.products.empty' | translate }}</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>{{ 'admin.products.name' | translate }}</th>
+          <th>{{ 'admin.products.price' | translate }}</th>
+          <th>{{ 'admin.products.stock' | translate }}</th>
+          <th>{{ 'admin.products.status' | translate }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of products(); track product.id) {
+          <tr [class.inactive]="!product.active">
+            <td>{{ product.name }}</td>
+            <td>{{ product.price | number: '1.2-2' }}</td>
+            <td>{{ product.stock }}</td>
+            <td>
+              {{ (product.active ? 'admin.products.active' : 'admin.products.inactive') | translate }}
+            </td>
+            <td class="actions">
+              <a [routerLink]="['/admin/products', product.id, 'edit']">
+                {{ 'admin.products.edit' | translate }}
+              </a>
+              @if (product.active) {
+                <button type="button" (click)="askDelete(product.id)">
+                  {{ 'admin.products.delete' | translate }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+</section>
+
+<app-confirm-dialog
+  [open]="pendingDeleteId() !== null"
+  [title]="'admin.products.deleteTitle' | translate"
+  [message]="'admin.products.deleteMessage' | translate"
+  [confirmLabel]="'admin.products.delete' | translate"
+  [cancelLabel]="'common.cancel' | translate"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

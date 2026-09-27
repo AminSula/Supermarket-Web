@@ -1,0 +1,23 @@
+<section class="login">
+  <h1>{{ 'admin.login.title' | translate }}</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label>
+      {{ 'admin.login.username' | translate }}
+      <input type="text" formControlName="username" autocomplete="username" />
+    </label>
+
+    <label>
+      {{ 'admin.login.password' | translate }}
+      <input type="password" formControlName="password" autocomplete="current-password" />
+    </label>
+
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? ('admin.login.loggingIn' | translate) : ('admin.login.login' | translate) }}
+    </button>
+
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
+    }
+  </form>
+</section>

@@ -1,0 +1,87 @@
+.product-detail {
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+
+  .back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+
+  .category {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  h1 {
+    margin: 0.3rem 0 0.8rem;
+  }
+
+  .description {
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .price {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stock {
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .add-to-cart-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+
+    input {
+      width: 70px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem;
+    }
+
+    button {
+      flex: 1;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
+  .added-message {
+    margin-top: 0.5rem;
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  .error {
+    color: #d64545;
+  }
+}

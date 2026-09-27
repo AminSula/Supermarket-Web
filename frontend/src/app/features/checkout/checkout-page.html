@@ -1,0 +1,69 @@
+<section class="checkout-page">
+  @if (completedOrder(); as order) {
+    <div class="confirmation">
+      <h1>{{ 'checkout.thankYou' | translate }}</h1>
+      <p>{{ 'checkout.orderNumber' | translate }} #{{ order.id }}</p>
+
+      <ul class="items">
+        @for (item of order.items; track item.productId) {
+          <li>{{ item.quantity }}x {{ item.productName }} — {{ item.subtotal | number: '1.2-2' }}</li>
+        }
+      </ul>
+
+      <div class="total">{{ 'checkout.total' | translate }}: {{ order.totalAmount | number: '1.2-2' }}</div>
+      <p class="payment-note">{{ 'checkout.cashOnDelivery' | translate }}</p>
+
+      <a routerLink="/" class="btn">{{ 'checkout.backToShopping' | translate }}</a>
+    </div>
+  } @else if (cartService.cartItems().length === 0) {
+    <p>{{ 'checkout.emptyCart' | translate }}</p>
+    <a routerLink="/" class="btn">{{ 'cart.continueShopping' | translate }}</a>
+  } @else {
+    <h1>{{ 'checkout.title' | translate }}</h1>
+
+    <div class="summary">
+      @for (item of cartService.cartItems(); track item.productId) {
+        <div class="line">
+          <span>{{ item.quantity }}x {{ item.name }}</span>
+          <span>{{ item.price * item.quantity | number: '1.2-2' }}</span>
+        </div>
+      }
+      <div class="line total">
+        <span>{{ 'cart.total' | translate }}</span>
+        <span>{{ cartService.total() | number: '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        {{ 'checkout.name' | translate }}
+        <input type="text" formControlName="customerName" />
+      </label>
+
+      <label>
+        {{ 'checkout.phone' | translate }}
+        <input type="tel" formControlName="phone" />
+      </label>
+
+      <label>
+        {{ 'checkout.address' | translate }}
+        <textarea formControlName="address" rows="2"></textarea>
+      </label>
+
+      <label>
+        {{ 'checkout.notes' | translate }}
+        <textarea formControlName="notes" rows="2"></textarea>
+      </label>
+
+      <p class="payment-note">{{ 'checkout.cashOnDelivery' | translate }}</p>
+
+      <button type="submit" [disabled]="submitting()">
+        {{ submitting() ? ('checkout.placing' | translate) : ('checkout.placeOrder' | translate) }}
+      </button>
+
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
+    </form>
+  }
+</section>

@@ -1,0 +1,117 @@
+{
+  "common": {
+    "cancel": "Cancel"
+  },
+  "nav": {
+    "home": "Home",
+    "adminSection": "Admin",
+    "categories": "Categories",
+    "products": "Products",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "catalog": {
+    "title": "Products",
+    "searchPlaceholder": "Search products...",
+    "allCategories": "All categories",
+    "search": "Search",
+    "loading": "Loading products...",
+    "noResults": "No products found.",
+    "previous": "Previous",
+    "next": "Next",
+    "addToCart": "Add to cart"
+  },
+  "productDetail": {
+    "back": "Back to products",
+    "loading": "Loading...",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "addToCart": "Add to cart",
+    "added": "Added to cart!"
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "continueShopping": "Continue shopping",
+    "product": "Product",
+    "price": "Price",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "remove": "Remove",
+    "total": "Total",
+    "checkout": "Proceed to checkout"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "emptyCart": "Your cart is empty — add something first.",
+    "name": "Full name",
+    "phone": "Phone number",
+    "address": "Delivery address",
+    "notes": "Notes (optional)",
+    "cashOnDelivery": "Payment: cash on delivery.",
+    "placeOrder": "Place order",
+    "placing": "Placing order...",
+    "thankYou": "Thank you for your order!",
+    "orderNumber": "Order",
+    "total": "Total",
+    "backToShopping": "Back to shopping"
+  },
+  "admin": {
+    "login": {
+      "title": "Owner login",
+      "username": "Username",
+      "password": "Password",
+      "login": "Log in",
+      "loggingIn": "Logging in..."
+    },
+    "addProduct": {
+      "name": "Name",
+      "nameRequired": "Name is required.",
+      "description": "Description",
+      "price": "Price",
+      "priceInvalid": "Enter a price greater than 0.",
+      "stock": "Stock",
+      "stockInvalid": "Stock cannot be negative.",
+      "categoryId": "Category",
+      "categoryPlaceholder": "Select a category",
+      "categoryRequired": "Category is required.",
+      "save": "Save product",
+      "saving": "Saving..."
+    },
+    "products": {
+      "title": "Products",
+      "add": "Add product",
+      "addTitle": "Add product",
+      "editTitle": "Edit product",
+      "loading": "Loading products...",
+      "empty": "No products yet.",
+      "name": "Name",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Hidden",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteTitle": "Delete product?",
+      "deleteMessage": "This hides the product from the storefront. It won't be permanently removed."
+    },
+    "categories": {
+      "title": "Categories",
+      "add": "Add category",
+      "addTitle": "Add category",
+      "editTitle": "Edit category",
+      "loading": "Loading categories...",
+      "empty": "No categories yet.",
+      "nameAl": "Name (Albanian)",
+      "nameEn": "Name (English)",
+      "nameRequired": "Name is required.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteTitle": "Delete category?",
+      "deleteMessage": "This can't be undone. Categories still used by products can't be deleted.",
+      "save": "Save category",
+      "saving": "Saving..."
+    }
+  }
+}

@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: supermarket-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/supermarket
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+app:
+  jwt:
+    secret: change-this-to-a-long-random-secret-before-production
+    expiration-ms: 86400000 # 24h
+  owner:
+    username: owner
+    password: owner123 # only used to seed the initial account — change before real deployment

@@ -1,0 +1,15 @@
+@if (open) {
+  <div class="overlay" (click)="cancelled.emit()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      @if (title) {
+        <h2>{{ title }}</h2>
+      }
+      <p>{{ message }}</p>
+
+      <div class="actions">
+        <button type="button" class="cancel" (click)="cancelled.emit()">{{ cancelLabel }}</button>
+        <button type="button" class="confirm" (click)="confirmed.emit()">{{ confirmLabel }}</button>
+      </div>
+    </div>
+  </div>
+}

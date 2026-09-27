@@ -1,0 +1,144 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+
+  .brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .cart-link {
+    position: relative;
+    text-decoration: none;
+    font-size: 1.2rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--bg);
+    }
+
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      font-size: 0.65rem;
+      font-weight: 700;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+    }
+  }
+
+  .lang-switch {
+    display: flex;
+    gap: 0.25rem;
+
+    button {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+
+      &.active {
+        background: var(--accent);
+        color: var(--accent-contrast);
+        border-color: var(--accent);
+      }
+    }
+  }
+
+  .theme-toggle {
+    border: 1px solid var(--border);
+    background: transparent;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+  }
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 0.75rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+
+  a,
+  .logout {
+    display: block;
+    padding: 0.5rem 0.6rem;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+
+    &:hover {
+      background: var(--bg);
+    }
+
+    &.active {
+      background: var(--accent);
+      color: var(--accent-contrast);
+    }
+  }
+
+  .logout {
+    color: #d64545;
+  }
+
+  .section-label {
+    margin-top: 1rem;
+    padding: 0 0.6rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+main {
+  flex: 1;
+  min-width: 0;
+}

@@ -1,0 +1,54 @@
+<section class="catalog">
+  <h1>{{ 'catalog.title' | translate }}</h1>
+
+  <div class="filters">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="onFilterChange()"
+      [placeholder]="'catalog.searchPlaceholder' | translate"
+    />
+
+    <select [(ngModel)]="selectedCategoryId" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="null">{{ 'catalog.allCategories' | translate }}</option>
+      @for (category of categories(); track category.id) {
+        <option [ngValue]="category.id">{{ category.name }}</option>
+      }
+    </select>
+
+    <button type="button" (click)="onFilterChange()">{{ 'catalog.search' | translate }}</button>
+  </div>
+
+  @if (loading()) {
+    <p>{{ 'catalog.loading' | translate }}</p>
+  } @else if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  } @else if (products().length === 0) {
+    <p>{{ 'catalog.noResults' | translate }}</p>
+  } @else {
+    <div class="grid">
+      @for (product of products(); track product.id) {
+        <button type="button" class="card" (click)="openProduct(product.id)">
+          <span class="name">{{ product.name }}</span>
+          <span class="category">{{ product.categoryName }}</span>
+          <span class="price">{{ product.price | number: '1.2-2' }}</span>
+          <span class="add-to-cart" (click)="addToCart($event, product)">
+            {{ 'catalog.addToCart' | translate }}
+          </span>
+        </button>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button type="button" [disabled]="page() === 0" (click)="goToPage(page() - 1)">
+          {{ 'catalog.previous' | translate }}
+        </button>
+        <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+        <button type="button" [disabled]="page() >= totalPages() - 1" (click)="goToPage(page() + 1)">
+          {{ 'catalog.next' | translate }}
+        </button>
+      </div>
+    }
+  }
+</section>

@@ -1,0 +1,50 @@
+<section class="cart-page">
+  <h1>{{ 'cart.title' | translate }}</h1>
+
+  @if (cartService.cartItems().length === 0) {
+    <p>{{ 'cart.empty' | translate }}</p>
+    <a routerLink="/" class="btn">{{ 'cart.continueShopping' | translate }}</a>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>{{ 'cart.product' | translate }}</th>
+          <th>{{ 'cart.price' | translate }}</th>
+          <th>{{ 'cart.quantity' | translate }}</th>
+          <th>{{ 'cart.subtotal' | translate }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of cartService.cartItems(); track item.productId) {
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price | number: '1.2-2' }}</td>
+            <td>
+              <input
+                type="number"
+                min="1"
+                [max]="item.stock"
+                [value]="item.quantity"
+                (change)="updateQuantity(item.productId, $any($event.target).value)"
+              />
+            </td>
+            <td>{{ item.price * item.quantity | number: '1.2-2' }}</td>
+            <td>
+              <button type="button" (click)="remove(item.productId)">{{ 'cart.remove' | translate }}</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="summary">
+      <span class="total-label">{{ 'cart.total' | translate }}</span>
+      <span class="total-value">{{ cartService.total() | number: '1.2-2' }}</span>
+    </div>
+
+    <button type="button" class="checkout-btn" (click)="goToCheckout()">
+      {{ 'cart.checkout' | translate }}
+    </button>
+  }
+</section>

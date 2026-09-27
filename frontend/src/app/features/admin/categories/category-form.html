@@ -1,0 +1,31 @@
+<section class="category-form">
+  <h1>
+    {{ (editingId() ? 'admin.categories.editTitle' : 'admin.categories.addTitle') | translate }}
+  </h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label>
+      {{ 'admin.categories.nameAl' | translate }}
+      <input type="text" formControlName="nameAl" />
+      @if (form.get('nameAl')?.invalid && form.get('nameAl')?.touched) {
+        <span class="error">{{ 'admin.categories.nameRequired' | translate }}</span>
+      }
+    </label>
+
+    <label>
+      {{ 'admin.categories.nameEn' | translate }}
+      <input type="text" formControlName="nameEn" />
+      @if (form.get('nameEn')?.invalid && form.get('nameEn')?.touched) {
+        <span class="error">{{ 'admin.categories.nameRequired' | translate }}</span>
+      }
+    </label>
+
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? ('admin.categories.saving' | translate) : ('admin.categories.save' | translate) }}
+    </button>
+
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
+    }
+  </form>
+</section>
