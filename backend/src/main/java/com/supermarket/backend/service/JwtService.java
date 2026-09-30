@@ -21,9 +21,6 @@ public class JwtService {
             @Value("${app.jwt.secret}") String secret,
             @Value("${app.jwt.expiration-ms}") long expirationMs
     ) {
-        // HS256 needs a key of at least 256 bits — the configured secret
-        // string is used as raw UTF-8 bytes, so it must be long enough
-        // (32+ characters). Swap this for a proper random secret in prod.
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
     }
@@ -40,10 +37,6 @@ public class JwtService {
                 .compact();
     }
 
-    // Returns the username if the token is valid and unexpired, or null otherwise.
-    // Deliberately swallows JwtException here — an invalid/expired token should
-    // just mean "not authenticated", not a 500 error, so the filter that calls
-    // this can treat null as "no valid auth" and move on.
     public String extractUsername(String token) {
         try {
             Claims claims = Jwts.parser()

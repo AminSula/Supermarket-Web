@@ -2,9 +2,10 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { ConfirmDialogComponent } from '../../../../shared/confirm-dialog/confirm-dialog';
 import { ProductService } from '../../../../core/services/product.service';
 import { ProductResponse } from '../../../../core/models/product.model';
-import { ConfirmDialogComponent } from '../../../../shared/confirm-dialog/confirm-dialog';
+
 
 @Component({
   selector: 'app-product-list',
@@ -14,7 +15,7 @@ import { ConfirmDialogComponent } from '../../../../shared/confirm-dialog/confir
   styleUrl: './product-list.scss',
 })
 export class ProductListComponent implements OnInit {
-  private productService = inject(ProductService);
+  productService = inject(ProductService);
 
   products = signal<ProductResponse[]>([]);
   loading = signal(true);

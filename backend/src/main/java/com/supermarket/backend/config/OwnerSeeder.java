@@ -10,12 +10,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/**
- * There's no registration endpoint — the owner is the only account, and
- * it's seeded here on first run rather than created through the API.
- * Change app.owner.username / app.owner.password in application.yml
- * before this first runs in anything beyond local dev.
- */
 @Component
 public class OwnerSeeder implements CommandLineRunner {
 
@@ -41,7 +35,7 @@ public class OwnerSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (userRepository.findByUsername(seedUsername).isPresent()) {
-            return; // already seeded, nothing to do
+            return;
         }
 
         User owner = new User();

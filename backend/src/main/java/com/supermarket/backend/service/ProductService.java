@@ -42,8 +42,6 @@ public class ProductService {
         return toResponse(saved);
     }
 
-    // Admin listing — unlike the public one, this includes inactive
-    // (soft-deleted) products too, so the owner can still see/manage them.
     public List<ProductResponse> listAdminProducts() {
         return productRepository.findAll().stream()
                 .map(this::toResponse)
@@ -65,17 +63,12 @@ public class ProductService {
         return toResponse(saved);
     }
 
-    // Soft delete: sets active = false rather than removing the row, so
-    // past OrderItems referencing this product still resolve correctly.
-    // The product simply stops appearing in public browsing/detail results.
     public void deleteProduct(Long id) {
         Product product = findProductOrThrow(id);
         product.setActive(false);
         productRepository.save(product);
     }
 
-    // Public storefront browsing: active products only, optional category
-    // filter + text search, paginated.
     public PageResponse<ProductPublicResponse> listPublicProducts(
             Long categoryId, String search, Language language, int page, int size) {
 
@@ -86,9 +79,6 @@ public class ProductService {
         return PageResponse.from(mapped);
     }
 
-    // Public product detail — 404s if the product doesn't exist OR has been
-    // soft-hidden (active = false), so a removed item isn't reachable by
-    // guessing its old URL.
     public ProductPublicResponse getPublicProduct(Long id, Language language) {
         Product product = productRepository.findById(id)
                 .filter(Product::isActive)
@@ -125,7 +115,8 @@ public class ProductService {
                 product.getPrice(),
                 product.getStock(),
                 product.getCategory().getId(),
-                categoryName
+                categoryName,
+                product.isHasImage()
         );
     }
 
@@ -138,6 +129,7 @@ public class ProductService {
                 product.getStock(),
                 product.getCategory().getId(),
                 product.isActive(),
+                product.isHasImage(),
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );

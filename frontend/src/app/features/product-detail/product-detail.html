@@ -7,6 +7,9 @@
     <p class="error">{{ errorMessage() }}</p>
   } @else if (product()) {
     <div class="card">
+      @if (product()!.hasImage) {
+        <img class="detail-image" [src]="productService.imageUrl(product()!.id)" alt="" />
+      }
       <span class="category">{{ product()!.categoryName }}</span>
       <h1>{{ product()!.name }}</h1>
       @if (product()!.description) {

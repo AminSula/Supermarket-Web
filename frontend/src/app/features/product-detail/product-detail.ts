@@ -15,7 +15,7 @@ import { ProductPublicResponse } from '../../core/models/product.model';
   styleUrl: './product-detail.scss',
 })
 export class ProductDetailComponent implements OnInit {
-  private productService = inject(ProductService);
+  productService = inject(ProductService);
   private route = inject(ActivatedRoute);
   cartService = inject(CartService);
 

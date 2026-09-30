@@ -29,6 +29,11 @@
     <div class="grid">
       @for (product of products(); track product.id) {
         <button type="button" class="card" (click)="openProduct(product.id)">
+          @if (product.hasImage) {
+            <img class="thumb" [src]="productService.imageUrl(product.id)" alt="" />
+          } @else {
+            <div class="thumb placeholder"></div>
+          }
           <span class="name">{{ product.name }}</span>
           <span class="category">{{ product.categoryName }}</span>
           <span class="price">{{ product.price | number: '1.2-2' }}</span>

@@ -11,12 +11,13 @@ public class ProductPublicResponse {
     private Integer stock;
     private Long categoryId;
     private String categoryName;
+    private boolean hasImage;
 
     public ProductPublicResponse() {
     }
 
     public ProductPublicResponse(Long id, String name, String description, BigDecimal price,
-                                 Integer stock, Long categoryId, String categoryName) {
+                                 Integer stock, Long categoryId, String categoryName, boolean hasImage) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -24,6 +25,7 @@ public class ProductPublicResponse {
         this.stock = stock;
         this.categoryId = categoryId;
         this.categoryName = categoryName;
+        this.hasImage = hasImage;
     }
 
     public Long getId() {
@@ -80,5 +82,13 @@ public class ProductPublicResponse {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public boolean isHasImage() {
+        return hasImage;
+    }
+
+    public void setHasImage(boolean hasImage) {
+        this.hasImage = hasImage;
     }
 }

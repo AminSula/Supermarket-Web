@@ -21,7 +21,6 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // No auth — guest checkout, per the site's design (no buyer accounts at all).
     @PostMapping
     public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResponse response = orderService.placeOrder(request);

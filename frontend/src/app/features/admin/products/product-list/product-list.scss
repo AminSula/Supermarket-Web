@@ -42,6 +42,14 @@
     text-transform: uppercase;
   }
 
+  .thumb {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+  }
+
   tr.inactive {
     opacity: 0.5;
   }

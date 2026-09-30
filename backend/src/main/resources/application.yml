@@ -27,6 +27,11 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB # small margin over max-file-size for multipart overhead
+
 app:
   jwt:
     secret: change-this-to-a-long-random-secret-before-production

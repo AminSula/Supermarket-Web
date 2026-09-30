@@ -1,0 +1,68 @@
+<section class="order-list">
+  <div class="header">
+    <h1>{{ 'admin.orders.title' | translate }}</h1>
+
+    <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+      <option value="">{{ 'admin.orders.allStatuses' | translate }}</option>
+      @for (status of statuses; track status) {
+        <option [value]="status">{{ ('admin.orders.status.' + status) | translate }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <p>{{ 'admin.orders.loading' | translate }}</p>
+  } @else if (orders().length === 0) {
+    <p>{{ 'admin.orders.empty' | translate }}</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{ 'admin.orders.customer' | translate }}</th>
+          <th>{{ 'admin.orders.phone' | translate }}</th>
+          <th>{{ 'admin.orders.total' | translate }}</th>
+          <th>{{ 'admin.orders.status.label' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of orders(); track order.id) {
+          <tr class="order-row" (click)="toggleExpand(order.id)">
+            <td>{{ expandedId() === order.id ? '▾' : '▸' }}</td>
+            <td>{{ order.customerName }}</td>
+            <td>{{ order.phone }}</td>
+            <td>{{ order.totalAmount | number: '1.2-2' }}</td>
+            <td (click)="$event.stopPropagation()">
+              <select [ngModel]="order.status" (ngModelChange)="changeStatus(order, $event)">
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ ('admin.orders.status.' + status) | translate }}</option>
+                }
+              </select>
+            </td>
+          </tr>
+          @if (expandedId() === order.id) {
+            <tr class="order-detail">
+              <td colspan="5">
+                <div class="detail-content">
+                  <p><strong>{{ 'admin.orders.address' | translate }}:</strong> {{ order.address }}</p>
+                  @if (order.notes) {
+                    <p><strong>{{ 'admin.orders.notes' | translate }}:</strong> {{ order.notes }}</p>
+                  }
+                  <ul>
+                    @for (item of order.items; track item.productId) {
+                      <li>{{ item.quantity }}x {{ item.productName }} — {{ item.subtotal | number: '1.2-2' }}</li>
+                    }
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+</section>

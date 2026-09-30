@@ -22,8 +22,6 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    // Snapshot of Product.price at order time — if the owner changes a
-    // product's price later, past orders must not silently change too.
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPriceAtOrder;
 

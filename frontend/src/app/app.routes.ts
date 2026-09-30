@@ -28,6 +28,12 @@ export const routes: Routes = [
       import('./features/admin/login/login').then((m) => m.LoginComponent),
   },
   {
+    path: 'admin/dashboard',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin/dashboard/dashboard').then((m) => m.DashboardComponent),
+  },
+  {
     path: 'admin/products',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -62,5 +68,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/admin/categories/category-form').then((m) => m.CategoryFormComponent),
+  },
+  {
+    path: 'admin/orders',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin/orders/order-list').then((m) => m.OrderListComponent),
   },
 ];

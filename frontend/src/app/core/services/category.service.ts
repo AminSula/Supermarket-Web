@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { retry } from 'rxjs/operators';
 import {
   CategoryPublicResponse,
   CategoryRequest,
@@ -35,7 +36,11 @@ export class CategoryService {
   }
 
   // Used by the product form's category dropdown — resolved names only.
+  // Same one-time retry as ProductService.listPublic, for the same reason:
+  // this fires in parallel with the products request on catalog page load.
   listPublic(lang: 'EN' | 'AL' = 'AL'): Observable<CategoryPublicResponse[]> {
-    return this.http.get<CategoryPublicResponse[]>(this.publicUrl, { params: { lang } });
+    return this.http
+      .get<CategoryPublicResponse[]>(this.publicUrl, { params: { lang } })
+      .pipe(retry({ count: 1, delay: 300 }));
   }
 }

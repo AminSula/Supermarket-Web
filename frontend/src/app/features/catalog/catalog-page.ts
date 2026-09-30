@@ -19,7 +19,7 @@ const PAGE_SIZE = 20;
   styleUrl: './catalog-page.scss',
 })
 export class CatalogPageComponent implements OnInit {
-  private productService = inject(ProductService);
+  productService = inject(ProductService);
   private categoryService = inject(CategoryService);
   private router = inject(Router);
   cartService = inject(CartService);
@@ -62,7 +62,8 @@ export class CatalogPageComponent implements OnInit {
           this.totalPages.set(result.totalPages);
           this.loading.set(false);
         },
-        error: () => {
+        error: (err) => {
+          console.error('Failed to load products:', err);
           this.errorMessage.set('Could not load products.');
           this.loading.set(false);
         },

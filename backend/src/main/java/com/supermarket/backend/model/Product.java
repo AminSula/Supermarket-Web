@@ -28,10 +28,11 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    // Soft-hide flag: lets the owner remove a product from the storefront
-    // without deleting it, so past OrderItems still resolve correctly.
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean hasImage = false;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -108,6 +109,14 @@ public class Product {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isHasImage() {
+        return hasImage;
+    }
+
+    public void setHasImage(boolean hasImage) {
+        this.hasImage = hasImage;
     }
 
     public LocalDateTime getCreatedAt() {

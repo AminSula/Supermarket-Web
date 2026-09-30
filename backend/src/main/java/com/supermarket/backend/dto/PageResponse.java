@@ -23,7 +23,6 @@ public class PageResponse<T> {
         this.totalPages = totalPages;
     }
 
-    // Convenience factory: builds a PageResponse<T> straight from a Spring Page<T>.
     public static <T> PageResponse<T> from(Page<T> pageResult) {
         return new PageResponse<>(
                 pageResult.getContent(),

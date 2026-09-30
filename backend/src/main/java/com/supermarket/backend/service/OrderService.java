@@ -4,10 +4,12 @@ import com.supermarket.backend.dto.OrderCreateRequest;
 import com.supermarket.backend.dto.OrderItemRequest;
 import com.supermarket.backend.dto.OrderItemResponse;
 import com.supermarket.backend.dto.OrderResponse;
+import com.supermarket.backend.dto.OrderStatusUpdateRequest;
 import com.supermarket.backend.exception.InsufficientStockException;
 import com.supermarket.backend.exception.ResourceNotFoundException;
 import com.supermarket.backend.model.Order;
 import com.supermarket.backend.model.OrderItem;
+import com.supermarket.backend.model.OrderStatus;
 import com.supermarket.backend.model.Product;
 import com.supermarket.backend.repository.OrderRepository;
 import com.supermarket.backend.repository.ProductRepository;
@@ -35,7 +37,6 @@ public class OrderService {
         order.setPhone(request.getPhone());
         order.setAddress(request.getAddress());
         order.setNotes(request.getNotes());
-        // status defaults to PENDING, paymentMethod to CASH_ON_DELIVERY on the entity
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -50,9 +51,6 @@ public class OrderService {
                         "Not enough stock for \"" + product.getName() + "\" (available: " + product.getStock() + ")");
             }
 
-            // Stock is validated here but NOT decremented — that happens
-            // when the owner marks the order CONFIRMED, per how order
-            // management is designed to work.
             BigDecimal unitPrice = product.getPrice();
             BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
 
@@ -70,6 +68,61 @@ public class OrderService {
 
         Order saved = orderRepository.save(order);
         return toResponse(saved);
+    }
+
+    public List<OrderResponse> listOrders(OrderStatus statusFilter) {
+        List<Order> orders = statusFilter != null
+                ? orderRepository.findByStatusOrderByCreatedAtDesc(statusFilter)
+                : orderRepository.findAllByOrderByCreatedAtDesc();
+
+        return orders.stream().map(this::toResponse).toList();
+    }
+
+    public OrderResponse getOrder(Long id) {
+        Order order = findOrderOrThrow(id);
+        return toResponse(order);
+    }
+
+    @Transactional
+    public OrderResponse updateStatus(Long id, OrderStatusUpdateRequest request) {
+        Order order = findOrderOrThrow(id);
+        OrderStatus oldStatus = order.getStatus();
+        OrderStatus newStatus = request.getStatus();
+
+        if (oldStatus == newStatus) {
+            return toResponse(order);
+        }
+
+        boolean enteringConfirmed = newStatus == OrderStatus.CONFIRMED && oldStatus != OrderStatus.CONFIRMED;
+        boolean leavingConfirmed = oldStatus == OrderStatus.CONFIRMED && newStatus != OrderStatus.CONFIRMED;
+
+        if (enteringConfirmed) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product.getStock() < item.getQuantity()) {
+                    throw new InsufficientStockException(
+                            "Not enough stock for \"" + product.getName() + "\" (available: " + product.getStock() + ")");
+                }
+            }
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.setStock(product.getStock() - item.getQuantity());
+            }
+        } else if (leavingConfirmed) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.setStock(product.getStock() + item.getQuantity());
+            }
+        }
+
+        order.setStatus(newStatus);
+        Order saved = orderRepository.save(order);
+        return toResponse(saved);
+    }
+
+    private Order findOrderOrThrow(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + id));
     }
 
     private OrderResponse toResponse(Order order) {

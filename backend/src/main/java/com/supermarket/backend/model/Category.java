@@ -13,8 +13,6 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // CascadeType.ALL + orphanRemoval: saving/deleting a Category
-    // saves/deletes its translations too — no separate repository calls needed.
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryTranslation> translations = new ArrayList<>();
 
@@ -45,8 +43,6 @@ public class Category {
         this.translations = translations;
     }
 
-    // Keeps both sides of the relationship in sync — call this instead of
-    // translations.add(...) directly so CategoryTranslation.category is set.
     public void addTranslation(CategoryTranslation translation) {
         translation.setCategory(this);
         this.translations.add(translation);

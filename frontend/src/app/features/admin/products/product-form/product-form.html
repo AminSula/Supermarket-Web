@@ -46,6 +46,32 @@
       }
     </label>
 
+    <div class="image-field">
+      <span class="image-label">{{ 'admin.products.image' | translate }}</span>
+
+      @if (previewUrl()) {
+        <!-- A newly picked file, not yet uploaded -->
+        <img class="preview" [src]="previewUrl()" alt="" />
+        <button type="button" class="link-btn" (click)="clearSelectedFile()">
+          {{ 'admin.products.imageCancel' | translate }}
+        </button>
+      } @else if (existingImage() && editingId()) {
+        <!-- The image already saved on the server -->
+        <img class="preview" [src]="imageUrl(editingId()!)" alt="" />
+        <button type="button" class="link-btn danger" (click)="removeExistingImage()">
+          {{ 'admin.products.imageRemove' | translate }}
+        </button>
+      } @else {
+        <p class="no-image">{{ 'admin.products.imageNone' | translate }}</p>
+      }
+
+      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" />
+
+      @if (imageError()) {
+        <span class="error">{{ imageError() }}</span>
+      }
+    </div>
+
     <button type="submit" [disabled]="submitting()">
       {{ submitting() ? ('admin.addProduct.saving' | translate) : ('admin.addProduct.save' | translate) }}
     </button>

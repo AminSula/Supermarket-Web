@@ -14,8 +14,6 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // No login, so the buyer's contact details are captured per order
-    // rather than looked up from a User account.
     @Column(nullable = false)
     private String customerName;
 

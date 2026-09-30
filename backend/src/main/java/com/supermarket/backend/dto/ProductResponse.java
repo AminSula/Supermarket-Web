@@ -12,6 +12,7 @@ public class ProductResponse {
     private Integer stock;
     private Long categoryId;
     private boolean active;
+    private boolean hasImage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -19,7 +20,7 @@ public class ProductResponse {
     }
 
     public ProductResponse(Long id, String name, String description, BigDecimal price,
-                           Integer stock, Long categoryId, boolean active,
+                           Integer stock, Long categoryId, boolean active, boolean hasImage,
                            LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
@@ -28,6 +29,7 @@ public class ProductResponse {
         this.stock = stock;
         this.categoryId = categoryId;
         this.active = active;
+        this.hasImage = hasImage;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -86,6 +88,14 @@ public class ProductResponse {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isHasImage() {
+        return hasImage;
+    }
+
+    public void setHasImage(boolean hasImage) {
+        this.hasImage = hasImage;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -14,6 +14,7 @@ export interface ProductResponse {
   stock: number;
   categoryId: number;
   active: boolean;
+  hasImage: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,4 +29,5 @@ export interface ProductPublicResponse {
   stock: number;
   categoryId: number;
   categoryName: string;
+  hasImage: boolean;
 }

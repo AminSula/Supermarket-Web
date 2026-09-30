@@ -37,7 +37,7 @@ export class LoginComponent {
     const value = this.form.getRawValue();
 
     this.authService.login({ username: value.username!, password: value.password! }).subscribe({
-      next: () => this.router.navigate(['/admin/categories']),
+      next: () => this.router.navigate(['/admin/dashboard']),
       error: (err) => {
         this.submitting.set(false);
         this.errorMessage.set(err?.error?.error ?? 'Login failed. Please try again.');

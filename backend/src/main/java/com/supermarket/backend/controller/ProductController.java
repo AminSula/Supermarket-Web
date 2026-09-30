@@ -2,11 +2,13 @@ package com.supermarket.backend.controller;
 
 import com.supermarket.backend.dto.ProductCreateRequest;
 import com.supermarket.backend.dto.ProductResponse;
+import com.supermarket.backend.service.ProductImageService;
 import com.supermarket.backend.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,19 +17,19 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductImageService productImageService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductImageService productImageService) {
         this.productService = productService;
+        this.productImageService = productImageService;
     }
 
-    // Owner adds a new item to the supermarket.
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductCreateRequest request) {
         ProductResponse response = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Includes inactive (soft-deleted) products, unlike the public listing.
     @GetMapping
     public List<ProductResponse> list() {
         return productService.listAdminProducts();
@@ -43,10 +45,21 @@ public class ProductController {
         return productService.updateProduct(id, request);
     }
 
-    // Soft delete — sets active = false rather than removing the row.
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/image")
+    public ResponseEntity<Void> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        productImageService.uploadImage(id, file);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
+        productImageService.deleteImage(id);
         return ResponseEntity.noContent().build();
     }
 }

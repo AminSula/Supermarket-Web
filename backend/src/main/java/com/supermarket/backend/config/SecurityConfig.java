@@ -10,13 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Real security config, replacing the temporary permit-all one:
- * - /api/auth/login, public product/category browsing, and static
- *   (Angular) resources are open to everyone
- * - /api/admin/** requires a valid JWT (checked by JwtAuthenticationFilter)
- * - No sessions — every request must carry its own Bearer token
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

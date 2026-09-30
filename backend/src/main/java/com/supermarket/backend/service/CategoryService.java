@@ -37,8 +37,6 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + id));
 
-        // Clear + re-add rather than diffing: simplest correct approach given
-        // orphanRemoval=true, and category translation lists are always small.
         category.getTranslations().clear();
         applyTranslations(category, request);
 
@@ -65,10 +63,6 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    // Public storefront listing: resolves one name per category for the
-    // requested language, falling back to Albanian (the site default) if
-    // that specific translation is missing, and finally to whatever
-    // translation exists at all so a category is never returned nameless.
     public List<CategoryPublicResponse> listCategoriesPublic(Language language) {
         return categoryRepository.findAll().stream()
                 .map(category -> new CategoryPublicResponse(category.getId(), resolveName(category, language)))

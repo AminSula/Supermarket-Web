@@ -12,6 +12,7 @@
     <table>
       <thead>
         <tr>
+          <th></th>
           <th>{{ 'admin.products.name' | translate }}</th>
           <th>{{ 'admin.products.price' | translate }}</th>
           <th>{{ 'admin.products.stock' | translate }}</th>
@@ -22,6 +23,11 @@
       <tbody>
         @for (product of products(); track product.id) {
           <tr [class.inactive]="!product.active">
+            <td>
+              @if (product.hasImage) {
+                <img class="thumb" [src]="productService.imageUrl(product.id)" alt="" />
+              }
+            </td>
             <td>{{ product.name }}</td>
             <td>{{ product.price | number: '1.2-2' }}</td>
             <td>{{ product.stock }}</td>

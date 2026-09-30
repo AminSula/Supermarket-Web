@@ -20,7 +20,6 @@ public class PublicCategoryController {
         this.categoryService = categoryService;
     }
 
-    // e.g. GET /api/categories?lang=en — defaults to Albanian, the site's primary language.
     @GetMapping
     public List<CategoryPublicResponse> list(@RequestParam(defaultValue = "AL") Language lang) {
         return categoryService.listCategoriesPublic(lang);

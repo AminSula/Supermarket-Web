@@ -60,4 +60,53 @@
     color: var(--accent);
     font-size: 0.9rem;
   }
+
+  .image-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+
+    .image-label {
+      font-size: 0.9rem;
+    }
+
+    .preview {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .no-image {
+      margin: 0;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    input[type='file'] {
+      padding: 0.3rem 0;
+      background: none;
+      border: none;
+    }
+
+    // Overrides the generic accent-filled `button` style above — these two
+    // are plain text links, not the primary submit action.
+    .link-btn {
+      align-self: flex-start;
+      background: none;
+      color: var(--accent);
+      border: none;
+      padding: 0;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-decoration: underline;
+
+      &.danger {
+        color: #d64545;
+      }
+    }
+  }
 }

@@ -5,8 +5,10 @@
   "nav": {
     "home": "Home",
     "adminSection": "Admin",
+    "dashboard": "Dashboard",
     "categories": "Categories",
     "products": "Products",
+    "orders": "Orders",
     "login": "Login",
     "logout": "Logout"
   },
@@ -94,7 +96,11 @@
       "edit": "Edit",
       "delete": "Delete",
       "deleteTitle": "Delete product?",
-      "deleteMessage": "This hides the product from the storefront. It won't be permanently removed."
+      "deleteMessage": "This hides the product from the storefront. It won't be permanently removed.",
+      "image": "Image",
+      "imageNone": "No image yet.",
+      "imageCancel": "Cancel",
+      "imageRemove": "Remove image"
     },
     "categories": {
       "title": "Categories",
@@ -112,6 +118,38 @@
       "deleteMessage": "This can't be undone. Categories still used by products can't be deleted.",
       "save": "Save category",
       "saving": "Saving..."
+    },
+    "orders": {
+      "title": "Orders",
+      "allStatuses": "All statuses",
+      "loading": "Loading orders...",
+      "empty": "No orders yet.",
+      "customer": "Customer",
+      "phone": "Phone",
+      "total": "Total",
+      "address": "Address",
+      "notes": "Notes",
+      "status": {
+        "label": "Status",
+        "PENDING": "Pending",
+        "CONFIRMED": "Confirmed",
+        "DELIVERED": "Delivered",
+        "CANCELLED": "Cancelled"
+      }
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "loading": "Loading dashboard...",
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "orders": "orders",
+      "revenueOverTime": "Revenue — last 14 days",
+      "ordersByStatus": "Orders by status",
+      "topProducts": "Top-selling products",
+      "noSales": "No sales yet.",
+      "sold": "Sold",
+      "revenue": "Revenue"
     }
   }
 }
