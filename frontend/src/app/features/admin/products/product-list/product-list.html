@@ -57,8 +57,8 @@
         </a>
       </div>
     } @else {
-      <div class="table-card">
-        <table class="data-table">
+      <div class="table-card cards">
+        <table class="data-table cards">
           <thead>
             <tr>
               <th></th>
@@ -85,9 +85,9 @@
                   </div>
                 </td>
                 <td class="name">{{ product.name }}</td>
-                <td class="num price">{{ product.price | number: '1.2-2' }}</td>
-                <td class="num" [class.stock-zero]="product.stock === 0">{{ product.stock }}</td>
-                <td>
+                <td class="num price" [attr.data-label]="'admin.products.price' | translate">{{ product.price | number: '1.2-2' }}</td>
+                <td class="num stock" [attr.data-label]="'admin.products.stock' | translate" [class.stock-zero]="product.stock === 0">{{ product.stock }}</td>
+                <td class="status-cell">
                   <span class="pill" [class.success]="product.active">
                     {{ product.active ? ('admin.products.active' | translate) : t('admin.products.archived', 'Archived') }}
                   </span>

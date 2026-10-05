@@ -129,16 +129,18 @@
           </div>
         } @else {
           <!-- Has images: a tidy grid of tiles, plus a small button (same size as Delete) to add more -->
-          <div class="tiles">
-            @for (imageId of imageIds(); track imageId; let i = $index) {
-              <div class="tile" [class.busy]="isBusy(imageId)">
-                <img appLazy [src]="imageUrl(imageId)" alt="" />
+          <div class="tiles" [class.locked]="submitting()">
+            @for (item of gallery(); track item.key; let i = $index) {
+              <div class="tile">
+                <img appLazy [src]="itemUrl(item)" alt="" />
 
                 @if (i === 0) {
                   <span class="badge cover">
                     <app-icon name="star" [size]="12" [stroke]="2.4" />
                     {{ t('admin.products.cover', 'Cover') }}
                   </span>
+                } @else if (item.kind === 'new') {
+                  <span class="badge fresh">{{ t('admin.products.newImage', 'New') }}</span>
                 }
 
                 <div class="tile-actions">
@@ -148,7 +150,7 @@
                       class="tile-btn"
                       [title]="t('admin.products.setCover', 'Set as cover')"
                       [attr.aria-label]="t('admin.products.setCover', 'Set as cover')"
-                      (click)="makeCover(imageId)"
+                      (click)="makeCover(item.key)"
                     >
                       <app-icon name="star" [size]="15" />
                     </button>
@@ -158,57 +160,11 @@
                     class="tile-btn danger"
                     [title]="t('admin.products.removeImage', 'Remove image')"
                     [attr.aria-label]="t('admin.products.removeImage', 'Remove image')"
-                    (click)="removeImage(imageId)"
+                    (click)="removeItem(item.key)"
                   >
-                    <app-icon name="trash" [size]="15" />
+                    <app-icon [name]="item.kind === 'new' ? 'close' : 'trash'" [size]="15" />
                   </button>
                 </div>
-
-                @if (isBusy(imageId)) {
-                  <span class="tile-spinner"></span>
-                }
-              </div>
-            }
-
-            @for (p of pending(); track p.localId; let j = $index) {
-              <div class="tile pending" [class.busy]="p.status === 'uploading'">
-                <img [src]="p.url" alt="" />
-
-                @if (imageIds().length === 0 && j === 0) {
-                  <span class="badge cover">
-                    <app-icon name="star" [size]="12" [stroke]="2.4" />
-                    {{ t('admin.products.cover', 'Cover') }}
-                  </span>
-                } @else {
-                  <span class="badge fresh">{{ t('admin.products.newImage', 'New') }}</span>
-                }
-
-                @if (p.status === 'queued') {
-                  <div class="tile-actions">
-                    @if (imageIds().length === 0 && j > 0) {
-                      <button
-                        type="button"
-                        class="tile-btn"
-                        [title]="t('admin.products.setCover', 'Set as cover')"
-                        [attr.aria-label]="t('admin.products.setCover', 'Set as cover')"
-                        (click)="makePendingCover(p.localId)"
-                      >
-                        <app-icon name="star" [size]="15" />
-                      </button>
-                    }
-                    <button
-                      type="button"
-                      class="tile-btn danger"
-                      [title]="t('admin.products.removeImage', 'Remove image')"
-                      [attr.aria-label]="t('admin.products.removeImage', 'Remove image')"
-                      (click)="removePending(p.localId)"
-                    >
-                      <app-icon name="close" [size]="15" />
-                    </button>
-                  </div>
-                } @else {
-                  <span class="tile-spinner"></span>
-                }
               </div>
             }
           </div>
@@ -248,7 +204,7 @@
 
     <div class="form-actions">
       <a appBtn="secondary" icon="close" routerLink="/admin/products">{{ 'common.cancel' | translate }}</a>
-      <button type="submit" appBtn="primary" icon="save" [loading]="submitting()" [disabled]="submitting() || isUploading()">
+      <button type="submit" appBtn="primary" icon="save" [loading]="submitting()" [disabled]="submitting()">
         {{ submitting() ? ('admin.addProduct.saving' | translate) : ('admin.addProduct.save' | translate) }}
       </button>
     </div>

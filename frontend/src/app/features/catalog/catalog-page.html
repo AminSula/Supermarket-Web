@@ -8,6 +8,7 @@
         type="text"
         [(ngModel)]="searchTerm"
         (keyup.enter)="onFilterChange()"
+        enterkeyhint="search"
         [placeholder]="'catalog.searchPlaceholder' | translate"
       />
       @if (searchTerm) {
@@ -15,6 +16,10 @@
           <app-icon name="close" [size]="16" />
         </button>
       }
+      <!-- phones: the search button lives inside the input; the big one below is hidden -->
+      <button type="button" class="go" aria-label="Search" (click)="onFilterChange()">
+        <app-icon name="search" [size]="18" [stroke]="2.2" />
+      </button>
     </div>
 
     <app-select
@@ -24,7 +29,7 @@
       [ariaLabel]="'catalog.allCategories' | translate"
     />
 
-    <button type="button" appBtn="primary" icon="search" (click)="onFilterChange()">
+    <button type="button" class="search-btn" appBtn="primary" icon="search" (click)="onFilterChange()">
       {{ 'catalog.search' | translate }}
     </button>
   </div>

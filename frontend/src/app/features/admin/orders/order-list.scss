@@ -125,7 +125,7 @@
     }
   }
 
-  // --- Expandable details -------------------
+  // --- Expandable details (grid-rows trick animates height: auto) -------------------
   .order-detail {
     &:hover {
       background: transparent;
@@ -250,6 +250,79 @@
     .item-sub {
       font-weight: 600;
       font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .data-table tbody.order:last-of-type td {
+    border-bottom: none;
+  }
+
+  @media (max-width: 700px) {
+    .data-table.cards tbody.order {
+      display: block;
+      margin-bottom: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .data-table.cards tr.order-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'customer chev'
+        'phone chev'
+        'total status';
+      gap: 0.45rem 0.8rem;
+      align-items: center;
+      padding: 0.95rem 1rem;
+    }
+
+    .customer-cell {
+      grid-area: customer;
+    }
+    .phone-cell {
+      grid-area: phone;
+    }
+    .chev-cell {
+      grid-area: chev;
+      width: auto;
+      align-self: start;
+    }
+    .total-cell {
+      grid-area: total;
+      text-align: left;
+    }
+    .status-td {
+      grid-area: status;
+      justify-self: end;
+    }
+
+    .total-cell::before {
+      display: inline;
+      margin: 0 0.4rem 0 0;
+    }
+
+    .status-cell {
+      width: 100%;
+
+      app-select {
+        width: 150px;
+      }
+    }
+
+    .data-table.cards tr.order-detail {
+      display: block;
+    }
+
+    .detail {
+      padding: 0.2rem 1rem 1rem;
+    }
+
+    app-select.filter {
+      width: 100%;
     }
   }
 

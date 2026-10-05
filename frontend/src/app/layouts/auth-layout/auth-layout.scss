@@ -1,13 +1,22 @@
 .auth-shell {
-  --header-h: 0px;
-  position: relative;
+  --header-h: 60px;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
 }
 
 .corner {
-  position: absolute;
-  top: 1rem;
-  right: 1.25rem;
-  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  height: var(--header-h);
+  padding: 0 1.25rem;
+}
+
+@media (max-width: 560px) {
+  .corner {
+    padding: 0 1rem;
+  }
 }

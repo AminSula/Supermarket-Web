@@ -24,8 +24,8 @@
       <p>{{ 'admin.orders.empty' | translate }}</p>
     </div>
   } @else {
-    <div class="table-card">
-      <table class="data-table">
+    <div class="table-card cards">
+      <table class="data-table cards grouped">
         <thead>
           <tr>
             <th></th>
@@ -35,8 +35,8 @@
             <th>{{ 'admin.orders.status.label' | translate }}</th>
           </tr>
         </thead>
-        <tbody>
           @for (order of orders(); track order.id; let i = $index) {
+            <tbody class="order">
             <tr
               class="order-row"
               [class.open]="expandedId() === order.id"
@@ -55,17 +55,17 @@
                   <app-icon name="chevron-right" [size]="18" />
                 </button>
               </td>
-              <td>
+              <td class="customer-cell">
                 <div class="customer">
                   <span class="avatar">{{ initials(order.customerName) }}</span>
                   <span class="customer-name">{{ order.customerName }}</span>
                 </div>
               </td>
-              <td>
+              <td class="phone-cell">
                 <span class="phone"><app-icon name="phone" [size]="15" />{{ order.phone }}</span>
               </td>
-              <td class="num total">{{ order.totalAmount | number: '1.2-2' }}</td>
-              <td (click)="$event.stopPropagation()">
+              <td class="num total total-cell" [attr.data-label]="'admin.orders.total' | translate">{{ order.totalAmount | number: '1.2-2' }}</td>
+              <td class="status-td" (click)="$event.stopPropagation()">
                 <div class="status-cell">
                   <span class="dot" [attr.data-status]="order.status"></span>
                   <app-select
@@ -126,8 +126,8 @@
                 </div>
               </td>
             </tr>
+            </tbody>
           }
-        </tbody>
       </table>
     </div>
   }

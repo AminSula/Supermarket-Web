@@ -17,7 +17,10 @@ import { RevealDirective } from '../../../../shared/reveal/reveal';
 import { SelectComponent, SelectOption } from '../../../../shared/select/select';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB 
+const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB — mirrors the backend's limit
+
+// Text for the image manager. Each has an English fallback, so the page reads fine even
+// before the matching keys are added to the en.json / al.json translation files.
 const LABEL_KEYS = [
   'admin.products.addImage',
   'admin.products.cover',
@@ -28,12 +31,14 @@ const LABEL_KEYS = [
   'admin.products.limitReached',
 ];
 
-interface PendingImage {
-  localId: number;
-  file: File;
-  url: string; 
-  status: 'queued' | 'uploading';
-}
+// One picture in the product's gallery, in display order (the first one is the cover).
+// Changes are only STAGED in the browser — nothing is sent to the server until Save, and
+// Cancel simply throws them away.
+//  - saved: already stored on the server
+//  - new:   chosen by the owner, still only in the browser (uploaded on Save)
+type GalleryItem =
+  | { key: string; kind: 'saved'; id: number }
+  | { key: string; kind: 'new'; file: File; url: string }; // url = local preview (object URL)
 
 @Component({
   selector: 'app-product-form',
@@ -69,24 +74,24 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   errorMessage = signal<string | null>(null);
   categories = signal<CategoryPublicResponse[]>([]);
 
+  // Options for the custom dropdown.
   categoryOptions = computed<SelectOption[]>(() =>
     this.categories().map((c) => ({ value: c.id, label: c.name })),
   );
 
   // --- Images ---------------------------------------------------------------------------
+  // Adding, removing and "set as cover" only change `gallery` in the browser. Pressing Save
+  // applies them to the server (see syncImages); pressing Cancel discards them.
   readonly maxImages = MAX_PRODUCT_IMAGES;
-  imageIds = signal<number[]>([]); 
-  pending = signal<PendingImage[]>([]);
-  busyIds = signal<ReadonlySet<number>>(new Set()); 
+  gallery = signal<GalleryItem[]>([]);
   imageError = signal<string | null>(null);
   dragging = signal(false);
 
-  totalImages = computed(() => this.imageIds().length + this.pending().length);
+  totalImages = computed(() => this.gallery().length);
   canAddMore = computed(() => this.totalImages() < this.maxImages);
-  isUploading = computed(() => this.pending().some((p) => p.status === 'uploading'));
 
+  private serverIds: number[] = []; // image ids as they are stored on the server right now
   private localCounter = 0;
-  private queueRunning = false;
 
   private labels = toSignal(this.translate.stream(LABEL_KEYS), { initialValue: {} as Record<string, string> });
 
@@ -121,40 +126,39 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           stock: product.stock,
           categoryId: product.categoryId,
         });
-        this.imageIds.set(product.imageIds ?? []);
+        this.setGalleryFromServer(product.imageIds ?? []);
       },
       error: () => this.errorMessage.set('Could not load this product.'),
     });
   }
 
   ngOnDestroy() {
-    this.pending().forEach((p) => URL.revokeObjectURL(p.url));
+    this.revokeNewUrls();
   }
 
+  // Field is invalid AND the user has interacted with it -> show the error state.
   invalid(name: string): boolean {
     const control = this.form.get(name);
     return !!control && control.invalid && control.touched;
   }
 
+  // Field is valid AND has been edited -> show the green tick.
   ok(name: string): boolean {
     const control = this.form.get(name);
     return !!control && control.valid && control.dirty;
   }
 
+  // Translated label, or the English fallback if the key isn't in the language files yet.
   t(key: string, fallback: string): string {
     const value = this.labels()[key];
     return value && value !== key ? value : fallback;
   }
 
-  imageUrl(imageId: number): string {
-    return this.productService.imageUrl(this.editingId()!, imageId);
+  itemUrl(item: GalleryItem): string {
+    return item.kind === 'saved' ? this.productService.imageUrl(this.editingId()!, item.id) : item.url;
   }
 
-  isBusy(imageId: number): boolean {
-    return this.busyIds().has(imageId);
-  }
-
-  // --- Choosing pictures -------------
+  // --- Choosing pictures (button, drop zone or drag & drop; several at once) -------------
   openPicker() {
     if (this.canAddMore()) {
       this.fileInput.nativeElement.click();
@@ -164,7 +168,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onFilesSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     this.addFiles(Array.from(input.files ?? []));
-    input.value = ''; 
+    input.value = ''; // lets the owner pick the same file again later
   }
 
   onDragOver(event: DragEvent) {
@@ -200,7 +204,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const accepted: PendingImage[] = [];
+    const accepted: GalleryItem[] = [];
     let truncated = false;
 
     for (const file of files) {
@@ -216,114 +220,46 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         this.imageError.set('Each image must be 5 MB or smaller.');
         continue;
       }
-      accepted.push({ localId: ++this.localCounter, file, url: URL.createObjectURL(file), status: 'queued' });
+      accepted.push({ key: `n${++this.localCounter}`, kind: 'new', file, url: URL.createObjectURL(file) });
     }
 
     if (truncated) {
       this.imageError.set(limitMessage);
     }
-    if (accepted.length === 0) {
-      return;
-    }
-
-    this.pending.update((list) => [...list, ...accepted]);
-
-    const productId = this.editingId();
-    if (productId) {
-      void this.processQueue(productId);
+    if (accepted.length > 0) {
+      this.gallery.update((list) => [...list, ...accepted]);
     }
   }
 
-  private async processQueue(productId: number) {
-    if (this.queueRunning) {
-      return;
-    }
-    this.queueRunning = true;
-
-    try {
-      while (true) {
-        const next = this.pending().find((p) => p.status === 'queued');
-        if (!next) {
-          break;
-        }
-
-        this.pending.update((list) => list.map((p) => (p.localId === next.localId ? { ...p, status: 'uploading' } : p)));
-
-        try {
-          const ids = await firstValueFrom(this.productService.addImage(productId, next.file));
-          this.imageIds.set(ids);
-        } catch (err: any) {
-          this.imageError.set(err?.error?.error ?? 'Could not upload an image.');
-        }
-        this.dropPending(next.localId);
-      }
-    } finally {
-      this.queueRunning = false;
-    }
-  }
-
-  private dropPending(localId: number) {
-    const item = this.pending().find((p) => p.localId === localId);
-    if (item) {
+  // --- Managing pictures (staged — nothing is saved until the owner presses Save) --------
+  removeItem(key: string) {
+    const item = this.gallery().find((g) => g.key === key);
+    if (item?.kind === 'new') {
       URL.revokeObjectURL(item.url);
     }
-    this.pending.update((list) => list.filter((p) => p.localId !== localId));
-  }
-
-  // --- Managing pictures ----------------------------------------------------------------
-  removePending(localId: number) {
-    this.dropPending(localId);
+    this.gallery.update((list) => list.filter((g) => g.key !== key));
     this.imageError.set(null);
   }
 
-  // New product only
-  makePendingCover(localId: number) {
-    this.pending.update((list) => {
-      const chosen = list.find((p) => p.localId === localId);
-      return chosen ? [chosen, ...list.filter((p) => p.localId !== localId)] : list;
+  // Moves a picture to the front so it becomes the cover.
+  makeCover(key: string) {
+    this.gallery.update((list) => {
+      const chosen = list.find((g) => g.key === key);
+      return chosen ? [chosen, ...list.filter((g) => g.key !== key)] : list;
     });
   }
 
-  async removeImage(imageId: number) {
-    const productId = this.editingId();
-    if (!productId || this.isBusy(imageId)) {
-      return;
-    }
-
-    this.imageError.set(null);
-    this.setBusy(imageId, true);
-    try {
-      this.imageIds.set(await firstValueFrom(this.productService.deleteImage(productId, imageId)));
-    } catch (err: any) {
-      this.imageError.set(err?.error?.error ?? 'Could not remove the image.');
-    } finally {
-      this.setBusy(imageId, false);
-    }
+  private setGalleryFromServer(ids: number[]) {
+    this.revokeNewUrls();
+    this.serverIds = ids;
+    this.gallery.set(ids.map((id) => ({ key: `s${id}`, kind: 'saved' as const, id })));
   }
 
-  async makeCover(imageId: number) {
-    const productId = this.editingId();
-    if (!productId || this.isBusy(imageId)) {
-      return;
-    }
-
-    this.imageError.set(null);
-    this.setBusy(imageId, true);
-    try {
-      const order = [imageId, ...this.imageIds().filter((id) => id !== imageId)];
-      this.imageIds.set(await firstValueFrom(this.productService.reorderImages(productId, order)));
-    } catch (err: any) {
-      this.imageError.set(err?.error?.error ?? 'Could not change the cover image.');
-    } finally {
-      this.setBusy(imageId, false);
-    }
-  }
-
-  private setBusy(imageId: number, busy: boolean) {
-    this.busyIds.update((current) => {
-      const next = new Set(current);
-      busy ? next.add(imageId) : next.delete(imageId);
-      return next;
+  private revokeNewUrls() {
+    this.gallery().forEach((g) => {
+      if (g.kind === 'new') {
+        URL.revokeObjectURL(g.url);
+      }
     });
   }
 
@@ -355,13 +291,16 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         id ? this.productService.update(id, request) : this.productService.createProduct(request),
       );
 
+      // From here on this is an existing product — so pressing Save again updates it
+      // instead of creating a duplicate.
       this.editingId.set(saved.id);
 
-      await this.processQueue(saved.id);
-
-      if (this.imageError()) {
+      // Apply the staged image changes.
+      const imagesOk = await this.syncImages(saved.id);
+      if (!imagesOk) {
+        // The product itself is saved either way; don't strand the owner with nothing saved.
         this.submitting.set(false);
-        this.errorMessage.set('Product saved, but some images could not be uploaded. You can add them again here.');
+        this.errorMessage.set('Product saved, but some image changes could not be applied. Please check the images below.');
         return;
       }
 
@@ -369,6 +308,56 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     } catch (err: any) {
       this.submitting.set(false);
       this.errorMessage.set(err?.error?.error ?? 'Something went wrong. Please try again.');
+    }
+  }
+
+  // Makes the server's images match the gallery the owner arranged:
+  // delete removed ones first (frees slots), upload the new ones, then fix the order.
+  private async syncImages(productId: number): Promise<boolean> {
+    const items = this.gallery();
+    const keptIds = new Set(items.filter((g) => g.kind === 'saved').map((g) => (g as { id: number }).id));
+    const toDelete = this.serverIds.filter((id) => !keptIds.has(id));
+    const toUpload = items.filter((g): g is Extract<GalleryItem, { kind: 'new' }> => g.kind === 'new');
+
+    try {
+      let currentIds = [...this.serverIds];
+
+      for (const id of toDelete) {
+        currentIds = await firstValueFrom(this.productService.deleteImage(productId, id));
+      }
+
+      // Uploaded one after another, so each new picture's server id is the one that just appeared.
+      const newIdByKey = new Map<string, number>();
+      for (const item of toUpload) {
+        const before = new Set(currentIds);
+        currentIds = await firstValueFrom(this.productService.addImage(productId, item.file));
+        const created = currentIds.find((id) => !before.has(id));
+        if (created != null) {
+          newIdByKey.set(item.key, created);
+        }
+      }
+
+      // Final order = the order of the tiles.
+      const desired = items
+        .map((g) => (g.kind === 'saved' ? g.id : newIdByKey.get(g.key)))
+        .filter((id): id is number => id != null);
+      const orderDiffers = desired.length === currentIds.length && desired.some((id, i) => id !== currentIds[i]);
+      if (orderDiffers) {
+        currentIds = await firstValueFrom(this.productService.reorderImages(productId, desired));
+      }
+
+      this.setGalleryFromServer(currentIds);
+      return true;
+    } catch (err: any) {
+      this.imageError.set(err?.error?.error ?? 'Some image changes could not be saved.');
+      // Show what is really stored now, so the tiles don't lie.
+      try {
+        const product = await firstValueFrom(this.productService.getAdmin(productId));
+        this.setGalleryFromServer(product.imageIds ?? []);
+      } catch {
+        /* keep the staged view if even the reload fails */
+      }
+      return false;
     }
   }
 }

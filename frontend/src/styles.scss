@@ -138,8 +138,7 @@ p {
   border-radius: var(--radius-sm);
 }
 
-// Every button and link gets a consistent, quick transition by default —
-// individual components can still override.
+// Every button and link gets a consistent, quick transition by default 
 button,
 a {
   transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease,
@@ -156,12 +155,12 @@ button:disabled {
   cursor: not-allowed;
 }
 
-// Subtle press feedback on all enabled buttons.
+// Subtle press feedback on all enabled buttons
 button:not(:disabled):active {
   transform: scale(0.97);
 }
 
-// Inputs: soft focus glow instead of the browser default.
+// Inputs
 input,
 select,
 textarea {
@@ -176,7 +175,7 @@ textarea {
   }
 }
 
-// Slim, themed scrollbars.
+// Slim, themed scrollbars
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -196,8 +195,6 @@ textarea {
 // ---------------------------------------------------------------------------
 // Animations
 // ---------------------------------------------------------------------------
-
-// Entrance animation for top-level pages
 @keyframes page-fade-in {
   from {
     opacity: 0;
@@ -213,7 +210,6 @@ textarea {
   animation: page-fade-in var(--dur-slow) var(--ease) backwards;
 }
 
-// Shared shimmer for skeleton loading placeholders 
 @keyframes skeleton-shimmer {
   0% {
     background-position: 200% 0;
@@ -223,7 +219,6 @@ textarea {
   }
 }
 
-// Respect users who prefer less motion — disables every animation/transition.
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -237,7 +232,7 @@ textarea {
 
 
 // ============================================================================
-// Shared UI kit — used by admin lists/forms (and reused by later pages)
+// Shared UI kit — used by admin lists/forms 
 // ============================================================================
 
 .sr-only {
@@ -394,6 +389,81 @@ textarea {
   }
 }
 
+// --- Tables on phones: each row becomes a card -------------------------------------
+@media (max-width: 700px) {
+  .table-card.cards {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .data-table.cards {
+    display: block;
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    td {
+      display: block;
+      padding: 0;
+      border: none;
+    }
+
+    td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.1rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    // action buttons 
+    .actions-cell {
+      display: flex;
+      gap: 0.6rem;
+      padding-top: 0.75rem;
+      margin-top: 0.3rem;
+      border-top: 1px dashed var(--border);
+      text-align: left;
+
+      > * {
+        flex: 1;
+        justify-content: center;
+      }
+
+      > * + * {
+        margin-left: 0;
+      }
+    }
+  }
+
+  // plain tables
+  .data-table.cards:not(.grouped) tbody tr {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.95rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+
+    &:hover {
+      background: var(--surface);
+    }
+  }
+}
+
+// Small status pill
 .pill {
   display: inline-flex;
   align-items: center;
@@ -577,7 +647,7 @@ textarea {
   animation: slide-down 0.25s var(--ease) both;
 }
 
-//number fields
+// Cleaner number fields
 input[type='number'] {
   appearance: textfield;
   -moz-appearance: textfield;

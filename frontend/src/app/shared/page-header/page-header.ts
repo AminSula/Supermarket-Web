@@ -1,7 +1,6 @@
 import { Component, input } from '@angular/core';
 import { IconComponent, IconName } from '../icon/icon';
 
-// Consistent page title with a gradient icon chip
 @Component({
   selector: 'app-page-header',
   standalone: true,
@@ -75,6 +74,28 @@ import { IconComponent, IconName } from '../icon/icon';
         align-items: center;
         gap: 0.6rem;
         margin-left: auto;
+      }
+
+      /* Phones: smaller title, and the action (e.g. Add product, or a filter) gets its own full-width row */
+      @media (max-width: 560px) {
+        .page-header {
+          gap: 0.75rem;
+        }
+
+        .title-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: 13px;
+        }
+
+        h1 {
+          font-size: 1.35rem;
+        }
+
+        .actions {
+          width: 100%;
+          margin-left: 0;
+        }
       }
     `,
   ],

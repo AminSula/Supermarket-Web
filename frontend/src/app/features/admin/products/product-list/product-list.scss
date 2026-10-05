@@ -7,7 +7,6 @@
     width: 1%; 
   }
 
-  // Placeholder tile
   .thumb-wrap {
     position: relative;
     display: grid;
@@ -53,7 +52,7 @@
     font-weight: 700;
   }
 
-  // Archived rows 
+  // Archived rows are dimmed a little so they read as "not in the store"
   tr.inactive {
     .thumb-wrap,
     .name,
@@ -166,6 +165,55 @@
       &:hover {
         background: var(--surface);
       }
+    }
+  }
+
+  @media (max-width: 700px) {
+    .data-table.cards tbody tr {
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      grid-template-areas:
+        'thumb name status'
+        'thumb price stock'
+        'actions actions actions';
+      column-gap: 0.85rem;
+      row-gap: 0.15rem;
+      align-items: center;
+    }
+
+    .thumb-cell {
+      grid-area: thumb;
+      width: auto;
+      align-self: start;
+    }
+    .thumb-wrap {
+      width: 56px;
+      height: 56px;
+    }
+    .name {
+      grid-area: name;
+      min-width: 0;
+    }
+    .status-cell {
+      grid-area: status;
+      justify-self: end;
+    }
+    .price {
+      grid-area: price;
+      text-align: left;
+    }
+    .stock {
+      grid-area: stock;
+      text-align: right;
+    }
+    .actions-cell {
+      grid-area: actions;
+    }
+
+    // price / stock
+    .price::before,
+    .stock::before {
+      display: inline;
+      margin: 0 0.4rem 0 0;
     }
   }
 

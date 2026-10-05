@@ -25,6 +25,10 @@
       width: 240px;
     }
 
+    .go {
+      display: none;
+    }
+
     .clear {
       display: grid;
       place-items: center;
@@ -213,12 +217,41 @@
     margin-top: 1rem;
     padding: 0 1rem 2rem;
 
-    app-select {
+    // Filter bar on phones: search box 
+    .filters {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+      padding: 0.75rem;
+    }
+
+    .filters .control.search {
+      flex: none;
+      min-width: 0;
       width: 100%;
     }
 
-    .filters > button[appBtn] {
-      flex: 1;
+    .filters app-select {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .filters .search-btn {
+      display: none;
+    }
+
+    .filters .go {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: #fff;
+      box-shadow: 0 4px 12px var(--ring);
     }
   }
 

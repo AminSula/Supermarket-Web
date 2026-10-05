@@ -9,12 +9,6 @@
   }
 }
 
-@keyframes tile-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .product-form {
   max-width: 720px;
   margin: 2rem auto;
@@ -55,7 +49,6 @@
     display: none;
   }
 
-  // Shown only while the product has no images yet
   .dropzone {
     display: flex;
     flex-direction: column;
@@ -97,7 +90,6 @@
     }
   }
 
-  // Once there are images: tiles + a small button underneath
   .tiles {
     display: flex;
     flex-wrap: wrap;
@@ -119,11 +111,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    // dims the picture while it is being uploaded / deleted / reordered
-    &.busy img {
-      opacity: 0.45;
     }
 
     .badge {
@@ -150,7 +137,7 @@
       }
     }
 
-    // Edit actions slide up on hover (always visible on touch screens)
+    // Edit actions slide up on hover 
     .tile-actions {
       position: absolute;
       right: 6px;
@@ -202,17 +189,10 @@
     }
   }
 
-  .tile-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 26px;
-    height: 26px;
-    margin: -13px 0 0 -13px;
-    border: 3px solid var(--accent);
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: tile-spin 0.7s linear infinite;
+  // While Save is running the tiles can't be edited
+  .tiles.locked {
+    pointer-events: none;
+    opacity: 0.7;
   }
 
   .image-toolbar {

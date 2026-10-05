@@ -23,8 +23,8 @@
       </a>
     </div>
   } @else {
-    <div class="table-card">
-      <table class="data-table">
+    <div class="table-card cards">
+      <table class="data-table cards">
         <thead>
           <tr>
             <th>{{ 'admin.categories.nameAl' | translate }}</th>
@@ -35,13 +35,13 @@
         <tbody>
           @for (category of categories(); track category.id; let i = $index) {
             <tr appReveal="fade" [revealDelay]="i < 12 ? i * 45 : 0">
-              <td>
+              <td [attr.data-label]="'admin.categories.nameAl' | translate">
                 <div class="cell-name">
                   <span class="row-icon"><app-icon name="tag" [size]="17" /></span>
                   <span>{{ nameFor(category, 'AL') }}</span>
                 </div>
               </td>
-              <td>{{ nameFor(category, 'EN') }}</td>
+              <td [attr.data-label]="'admin.categories.nameEn' | translate">{{ nameFor(category, 'EN') }}</td>
               <td class="actions-cell">
                 <a appBtn="edit" icon="edit" [routerLink]="['/admin/categories', category.id, 'edit']">
                   {{ 'admin.categories.edit' | translate }}
