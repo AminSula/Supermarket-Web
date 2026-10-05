@@ -1,50 +1,53 @@
-<section class="cart-page">
-  <h1>{{ 'cart.title' | translate }}</h1>
+<section class="cart-page page-fade-in">
+  <app-page-header icon="cart" [title]="'cart.title' | translate" />
 
   @if (cartService.cartItems().length === 0) {
-    <p>{{ 'cart.empty' | translate }}</p>
-    <a routerLink="/" class="btn">{{ 'cart.continueShopping' | translate }}</a>
-  } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>{{ 'cart.product' | translate }}</th>
-          <th>{{ 'cart.price' | translate }}</th>
-          <th>{{ 'cart.quantity' | translate }}</th>
-          <th>{{ 'cart.subtotal' | translate }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of cartService.cartItems(); track item.productId) {
-          <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.price | number: '1.2-2' }}</td>
-            <td>
-              <input
-                type="number"
-                min="1"
-                [max]="item.stock"
-                [value]="item.quantity"
-                (change)="updateQuantity(item.productId, $any($event.target).value)"
-              />
-            </td>
-            <td>{{ item.price * item.quantity | number: '1.2-2' }}</td>
-            <td>
-              <button type="button" (click)="remove(item.productId)">{{ 'cart.remove' | translate }}</button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-
-    <div class="summary">
-      <span class="total-label">{{ 'cart.total' | translate }}</span>
-      <span class="total-value">{{ cartService.total() | number: '1.2-2' }}</span>
+    <div class="table-card empty-state">
+      <span class="empty-icon"><app-icon name="cart" [size]="30" [stroke]="1.5" /></span>
+      <p>{{ 'cart.empty' | translate }}</p>
+      <a appBtn="primary" icon="arrow-left" routerLink="/">{{ 'cart.continueShopping' | translate }}</a>
     </div>
+  } @else {
+    <div class="cart-layout">
+      <ul class="cart-items">
+        @for (item of cartService.cartItems(); track item.productId; let i = $index) {
+          <li class="cart-item" appReveal [revealDelay]="i < 8 ? i * 60 : 0">
+            <span class="item-tile"><app-icon name="products" [size]="24" [stroke]="1.5" /></span>
 
-    <button type="button" class="checkout-btn" (click)="goToCheckout()">
-      {{ 'cart.checkout' | translate }}
-    </button>
+            <div class="item-info">
+              <a class="item-name" [routerLink]="['/products', item.productId]">{{ item.name }}</a>
+              <span class="unit-price">{{ item.price | number: '1.2-2' }}</span>
+            </div>
+
+            <app-quantity-stepper
+              class="item-qty"
+              [value]="item.quantity"
+              [max]="item.stock"
+              (valueChange)="updateQuantity(item.productId, $event)"
+            />
+
+            <span class="line-total">{{ item.price * item.quantity | number: '1.2-2' }}</span>
+
+            <button type="button" class="item-remove" appBtn="delete" icon="trash" (click)="remove(item.productId)">
+              {{ 'cart.remove' | translate }}
+            </button>
+          </li>
+        }
+      </ul>
+
+      <aside class="summary" appReveal="right" [revealDelay]="120">
+        <div class="summary-row">
+          <span class="total-label">{{ 'cart.total' | translate }}</span>
+          <span class="total-value" [appCountUp]="cartService.total()" [countDecimals]="2" [countDuration]="900"></span>
+        </div>
+
+        <a class="wide" appBtn="primary" icon="arrow-right" routerLink="/checkout">
+          {{ 'cart.checkout' | translate }}
+        </a>
+        <a class="wide" appBtn="secondary" icon="arrow-left" routerLink="/">
+          {{ 'cart.continueShopping' | translate }}
+        </a>
+      </aside>
+    </div>
   }
 </section>

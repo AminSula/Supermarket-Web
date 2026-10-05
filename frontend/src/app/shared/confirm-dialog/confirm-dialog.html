@@ -1,14 +1,16 @@
 @if (open) {
   <div class="overlay" (click)="cancelled.emit()">
-    <div class="dialog" (click)="$event.stopPropagation()">
+    <div class="dialog" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <span class="icon-badge"><app-icon name="alert" [size]="26" /></span>
+
       @if (title) {
         <h2>{{ title }}</h2>
       }
       <p>{{ message }}</p>
 
       <div class="actions">
-        <button type="button" class="cancel" (click)="cancelled.emit()">{{ cancelLabel }}</button>
-        <button type="button" class="confirm" (click)="confirmed.emit()">{{ confirmLabel }}</button>
+        <button type="button" appBtn="secondary" (click)="cancelled.emit()">{{ cancelLabel }}</button>
+        <button type="button" appBtn="danger" icon="trash" (click)="confirmed.emit()">{{ confirmLabel }}</button>
       </div>
     </div>
   </div>

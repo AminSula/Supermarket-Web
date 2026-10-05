@@ -2,7 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { retry } from 'rxjs/operators';
-import { ProductCreateRequest, ProductPublicResponse, ProductResponse } from '../models/product.model';
+import {
+  ProductCreateRequest,
+  ProductDeleteResponse,
+  ProductPublicResponse,
+  ProductResponse,
+} from '../models/product.model';
 import { PageResponse } from '../models/page.model';
 
 export interface ProductListParams {
@@ -36,26 +41,33 @@ export class ProductService {
     return this.http.put<ProductResponse>(`${this.adminUrl}/${id}`, request);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.adminUrl}/${id}`);
+  // Smart delete/Archive
+  delete(id: number): Observable<ProductDeleteResponse> {
+    return this.http.delete<ProductDeleteResponse>(`${this.adminUrl}/${id}`);
   }
 
-  // Multipart upload — do NOT set a Content-Type header manually here;
-  // the browser needs to set it itself (with the multipart boundary).
-  uploadImage(id: number, file: File): Observable<void> {
+  // Brings an archived product back to the store.
+  restore(id: number): Observable<ProductResponse> {
+    return this.http.post<ProductResponse>(`${this.adminUrl}/${id}/restore`, {});
+  }
+
+  // --- Gallery images (up to 5 per product) -----------------------------------------------
+  addImage(productId: number, file: File): Observable<number[]> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<void>(`${this.adminUrl}/${id}/image`, formData);
+    return this.http.post<number[]>(`${this.adminUrl}/${productId}/images`, formData);
   }
 
-  deleteImage(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.adminUrl}/${id}/image`);
+  deleteImage(productId: number, imageId: number): Observable<number[]> {
+    return this.http.delete<number[]>(`${this.adminUrl}/${productId}/images/${imageId}`);
   }
 
-  // Used directly as an <img [src]> — no need to fetch-then-blob, the
-  // browser can just GET this like any other image URL.
-  imageUrl(id: number): string {
-    return `${this.publicUrl}/${id}/image`;
+  reorderImages(productId: number, imageIds: number[]): Observable<number[]> {
+    return this.http.put<number[]>(`${this.adminUrl}/${productId}/images/order`, { imageIds });
+  }
+
+  imageUrl(productId: number, imageId: number): string {
+    return `${this.publicUrl}/${productId}/images/${imageId}`;
   }
 
   listPublic(params: ProductListParams = {}): Observable<PageResponse<ProductPublicResponse>> {
@@ -66,10 +78,6 @@ export class ProductService {
     query['page'] = String(params.page ?? 0);
     query['size'] = String(params.size ?? 20);
 
-    // One automatic retry: guards against a transient first-request hiccup
-    // (e.g. the dev proxy's very first concurrent requests right after a
-    // page load/compile) without masking a real, persistent backend error —
-    // a genuine failure still surfaces after the retry fails too.
     return this.http
       .get<PageResponse<ProductPublicResponse>>(this.publicUrl, { params: query })
       .pipe(retry({ count: 1, delay: 300 }));

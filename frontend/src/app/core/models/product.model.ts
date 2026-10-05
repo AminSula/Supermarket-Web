@@ -1,3 +1,5 @@
+export const MAX_PRODUCT_IMAGES = 5;
+
 export interface ProductCreateRequest {
   name: string;
   description?: string;
@@ -15,12 +17,13 @@ export interface ProductResponse {
   categoryId: number;
   active: boolean;
   hasImage: boolean;
+  imageIds: number[];
+  hasOrders: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-// Public storefront shape — no `active` flag (only active products are
-// ever returned publicly), and categoryName is pre-resolved server-side.
+// Public storefront shape 
 export interface ProductPublicResponse {
   id: number;
   name: string;
@@ -30,4 +33,9 @@ export interface ProductPublicResponse {
   categoryId: number;
   categoryName: string;
   hasImage: boolean;
+  imageIds: number[];
+}
+
+export interface ProductDeleteResponse {
+  archived: boolean;
 }

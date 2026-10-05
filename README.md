@@ -1,3 +1,13 @@
+## Admin access
+
+The owner panel is intentionally not linked from the storefront.
+
+- **Login:** `/admin/login` (e.g. `http://localhost:8080/admin/login`)
+- After logging in you land on `/admin/dashboard`. Opening any `/admin/...` page while logged out sends you to the login and brings you back afterwards.
+- The first owner account is created at startup from `app.owner.username` / `app.owner.password` in `application.yml`. **Change the password and `app.jwt.secret` before deploying**, preferably through environment variables (`APP_OWNER_PASSWORD`, `APP_JWT_SECRET`).
+
+
+
 # Supermarket online ordering platform
 
 Monorepo, single deployable: Spring Boot serves the Angular build.

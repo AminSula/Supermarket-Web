@@ -1,0 +1,36 @@
+<div class="store-shell">
+  <header class="store-header">
+    <a routerLink="/" class="brand">
+      <span class="brand-mark"><app-icon name="store" [size]="20" [stroke]="2" /></span>
+      <span class="brand-name">Supermarket</span>
+    </a>
+
+    <div class="controls">
+      <a
+        routerLink="/cart"
+        class="icon-btn cart-link"
+        routerLinkActive="active"
+        [attr.aria-label]="'cart.title' | translate"
+      >
+        <app-icon name="cart" [size]="21" />
+        @if (cartService.itemCount() > 0) {
+          <!-- tracking the count re-creates the badge on every change, replaying its pop animation -->
+          @for (count of [cartService.itemCount()]; track count) {
+            <span class="badge">{{ count }}</span>
+          }
+        }
+      </a>
+
+      <app-toolbar-controls />
+    </div>
+  </header>
+
+  <main>
+    <router-outlet />
+  </main>
+
+  <footer class="store-footer">
+    <span class="footer-brand"><app-icon name="store" [size]="16" /> Supermarket</span>
+    <span>© {{ year }}</span>
+  </footer>
+</div>

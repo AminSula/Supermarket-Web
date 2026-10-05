@@ -46,17 +46,25 @@ public class PublicProductController {
     }
 
     @GetMapping("/{id}/image")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id, WebRequest webRequest) {
-        ProductImage image = productImageService.getImage(id);
+    public ResponseEntity<byte[]> getCoverImage(@PathVariable Long id, WebRequest webRequest) {
+        return serve(productImageService.getPrimaryImage(id), webRequest, CacheControl.noCache().cachePublic());
+    }
 
-        String etag = "\"" + id + "-" + image.getUpdatedAt().toString().hashCode() + "\"";
+    @GetMapping("/{id}/images/{imageId}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id, @PathVariable Long imageId, WebRequest webRequest) {
+        return serve(productImageService.getImage(id, imageId), webRequest,
+                CacheControl.maxAge(Duration.ofDays(7)).cachePublic());
+    }
+
+    private ResponseEntity<byte[]> serve(ProductImage image, WebRequest webRequest, CacheControl cacheControl) {
+        String etag = "\"" + image.getId() + "-" + image.getUpdatedAt().toString().hashCode() + "\"";
         if (webRequest.checkNotModified(etag)) {
-            return null; // WebRequest already set the 304 response for us
+            return null;
         }
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(image.getContentType()))
-                .cacheControl(CacheControl.maxAge(Duration.ofDays(7)).cachePublic())
+                .cacheControl(cacheControl)
                 .eTag(etag)
                 .body(image.getImageData());
     }

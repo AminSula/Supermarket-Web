@@ -1,0 +1,187 @@
+:host {
+  --btn-bg: var(--surface);
+  --btn-fg: var(--text);
+  --btn-border: var(--border);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 42px;
+  padding: 0 1.15rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius-md);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    background-color var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease,
+    filter var(--dur-fast) ease;
+}
+
+// Hover lifts
+:host(:hover) {
+  transform: translateY(-2px);
+}
+:host(:active) {
+  transform: scale(0.95);
+}
+
+:host(:disabled) {
+  transform: none;
+  box-shadow: none;
+  filter: grayscale(0.2);
+}
+
+// --- Primary -------------------------------------------------------------------
+:host([data-variant='primary']) {
+  --btn-bg: var(--accent-gradient);
+  --btn-fg: #fff;
+  --btn-border: transparent;
+  box-shadow: 0 6px 16px var(--ring);
+}
+:host([data-variant='primary']:hover) {
+  box-shadow: 0 12px 26px var(--ring);
+  filter: brightness(1.06);
+}
+// light sweep across the button on hover
+:host([data-variant='primary'])::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s var(--ease);
+}
+:host([data-variant='primary']:hover)::after {
+  transform: translateX(120%);
+}
+
+// --- Secondary -----------------------------------------------------------------
+:host([data-variant='secondary']:hover) {
+  --btn-border: var(--accent);
+  --btn-fg: var(--accent);
+  --btn-bg: var(--accent-soft);
+}
+
+// --- Danger (solid) ------------------------------------------------------------
+:host([data-variant='danger']) {
+  --btn-bg: var(--danger);
+  --btn-fg: var(--on-danger);
+  --btn-border: transparent;
+  box-shadow: 0 6px 16px var(--danger-soft);
+}
+:host([data-variant='danger']:hover) {
+  box-shadow: 0 12px 24px var(--danger-soft);
+  filter: brightness(1.07);
+}
+
+// --- Row actions: edit / delete ------------------------------------------------
+:host([data-variant='edit']),
+:host([data-variant='delete']) {
+  height: 34px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  --btn-border: transparent;
+}
+
+:host([data-variant='edit']) {
+  --btn-bg: var(--accent-soft);
+  --btn-fg: var(--accent);
+}
+:host([data-variant='edit']:hover) {
+  --btn-bg: var(--accent-gradient);
+  --btn-fg: #fff;
+  box-shadow: 0 8px 18px var(--ring);
+}
+
+:host([data-variant='delete']) {
+  --btn-bg: var(--danger-soft);
+  --btn-fg: var(--danger);
+}
+:host([data-variant='delete']:hover) {
+  --btn-bg: var(--danger);
+  --btn-fg: var(--on-danger);
+  box-shadow: 0 8px 18px var(--danger-soft);
+}
+
+// Icon micro-animations
+@keyframes wiggle {
+  0% {
+    transform: rotate(0) scale(1);
+  }
+  30% {
+    transform: rotate(-18deg) scale(1.15);
+  }
+  60% {
+    transform: rotate(12deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(0) scale(1);
+  }
+}
+
+@keyframes shake-icon {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  25% {
+    transform: translateX(-2px) rotate(-12deg);
+  }
+  50% {
+    transform: translateX(2px) rotate(10deg);
+  }
+  75% {
+    transform: translateX(-1px) rotate(-6deg);
+  }
+}
+
+:host([data-variant='edit']:hover) .icon {
+  animation: wiggle 0.55s var(--ease);
+}
+:host([data-variant='delete']:hover) .icon {
+  animation: shake-icon 0.5s var(--ease);
+}
+:host([data-variant='primary']:hover) .icon {
+  transform: scale(1.12);
+}
+
+.icon {
+  transition: transform var(--dur) var(--ease-spring);
+}
+
+// --- Loading -------------------------------------------------------------------
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+:host(.loading) {
+  pointer-events: none;
+}
+:host(.loading:disabled) {
+  opacity: 0.85;
+}

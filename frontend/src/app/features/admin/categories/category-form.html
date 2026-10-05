@@ -1,31 +1,58 @@
-<section class="category-form">
-  <h1>
-    {{ (editingId() ? 'admin.categories.editTitle' : 'admin.categories.addTitle') | translate }}
-  </h1>
+<section class="category-form page-fade-in">
+  <app-page-header
+    icon="categories"
+    [title]="(editingId() ? 'admin.categories.editTitle' : 'admin.categories.addTitle') | translate"
+  />
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <label>
-      {{ 'admin.categories.nameAl' | translate }}
-      <input type="text" formControlName="nameAl" />
-      @if (form.get('nameAl')?.invalid && form.get('nameAl')?.touched) {
-        <span class="error">{{ 'admin.categories.nameRequired' | translate }}</span>
-      }
-    </label>
+  <form class="form-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid">
+      <div class="field full" [class.invalid]="invalid('nameAl')" appReveal>
+        <label class="field-label" for="cat-name-al">{{ 'admin.categories.nameAl' | translate }}</label>
+        <div class="control">
+          <span class="prefix">AL</span>
+          <input id="cat-name-al" type="text" formControlName="nameAl" autocomplete="off" />
+          @if (ok('nameAl')) {
+            <app-icon class="ok" name="check-circle" [size]="19" />
+          }
+        </div>
+        @if (invalid('nameAl')) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ 'admin.categories.nameRequired' | translate }}
+          </span>
+        }
+      </div>
 
-    <label>
-      {{ 'admin.categories.nameEn' | translate }}
-      <input type="text" formControlName="nameEn" />
-      @if (form.get('nameEn')?.invalid && form.get('nameEn')?.touched) {
-        <span class="error">{{ 'admin.categories.nameRequired' | translate }}</span>
-      }
-    </label>
-
-    <button type="submit" [disabled]="submitting()">
-      {{ submitting() ? ('admin.categories.saving' | translate) : ('admin.categories.save' | translate) }}
-    </button>
+      <div class="field full" [class.invalid]="invalid('nameEn')" appReveal [revealDelay]="70">
+        <label class="field-label" for="cat-name-en">{{ 'admin.categories.nameEn' | translate }}</label>
+        <div class="control">
+          <span class="prefix">EN</span>
+          <input id="cat-name-en" type="text" formControlName="nameEn" autocomplete="off" />
+          @if (ok('nameEn')) {
+            <app-icon class="ok" name="check-circle" [size]="19" />
+          }
+        </div>
+        @if (invalid('nameEn')) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ 'admin.categories.nameRequired' | translate }}
+          </span>
+        }
+      </div>
+    </div>
 
     @if (errorMessage()) {
-      <p class="error">{{ errorMessage() }}</p>
+      <div class="error-box">
+        <app-icon name="alert" [size]="20" />
+        <span>{{ errorMessage() }}</span>
+      </div>
     }
+
+    <div class="form-actions">
+      <a appBtn="secondary" icon="close" routerLink="/admin/categories">{{ 'common.cancel' | translate }}</a>
+      <button type="submit" appBtn="primary" icon="save" [loading]="submitting()" [disabled]="submitting()">
+        {{ submitting() ? ('admin.categories.saving' | translate) : ('admin.categories.save' | translate) }}
+      </button>
+    </div>
   </form>
 </section>

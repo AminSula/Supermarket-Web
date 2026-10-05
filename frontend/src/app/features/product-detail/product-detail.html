@@ -1,35 +1,78 @@
-<section class="product-detail">
-  <a routerLink="/" class="back">&larr; {{ 'productDetail.back' | translate }}</a>
+<section class="product-detail page-fade-in">
+  <a routerLink="/" class="back">
+    <app-icon name="arrow-left" [size]="18" />
+    {{ 'productDetail.back' | translate }}
+  </a>
 
   @if (loading()) {
-    <p>{{ 'productDetail.loading' | translate }}</p>
-  } @else if (errorMessage()) {
-    <p class="error">{{ errorMessage() }}</p>
-  } @else if (product()) {
-    <div class="card">
-      @if (product()!.hasImage) {
-        <img class="detail-image" [src]="productService.imageUrl(product()!.id)" alt="" />
-      }
-      <span class="category">{{ product()!.categoryName }}</span>
-      <h1>{{ product()!.name }}</h1>
-      @if (product()!.description) {
-        <p class="description">{{ product()!.description }}</p>
-      }
-      <div class="price">{{ product()!.price | number: '1.2-2' }}</div>
-      <div class="stock">
-        {{ (product()!.stock > 0 ? 'productDetail.inStock' : 'productDetail.outOfStock') | translate }}
+    <div class="detail-card">
+      <app-skeleton class="skeleton-media" height="auto" radius="16px" />
+      <div class="info">
+        <app-skeleton height="0.8rem" width="30%" />
+        <app-skeleton height="2rem" width="70%" />
+        <app-skeleton height="1rem" width="95%" />
+        <app-skeleton height="1rem" width="80%" />
+        <app-skeleton height="2.2rem" width="30%" />
+        <app-skeleton height="44px" width="100%" radius="12px" />
       </div>
-
-      @if (product()!.stock > 0) {
-        <div class="add-to-cart-row">
-          <input type="number" min="1" [max]="product()!.stock" [(ngModel)]="quantity" />
-          <button type="button" (click)="addToCart()">{{ 'productDetail.addToCart' | translate }}</button>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-box">
+      <app-icon name="alert" [size]="20" />
+      <span>{{ errorMessage() }}</span>
+    </div>
+  } @else {
+    @if (product(); as p) {
+      <div class="detail-card">
+        <div class="gallery" appReveal="scale">
+          @if (p.imageIds.length > 0) {
+            <app-image-carousel [urls]="imageUrls()" [alt]="p.name" />
+          } @else {
+            <div class="media"><app-icon name="image" [size]="64" [stroke]="1.2" /></div>
+          }
         </div>
 
-        @if (added()) {
-          <p class="added-message">{{ 'productDetail.added' | translate }}</p>
-        }
-      }
-    </div>
+        <div class="info">
+          <span class="category" appReveal [revealDelay]="60">
+            <app-icon name="tag" [size]="14" />
+            {{ p.categoryName }}
+          </span>
+
+          <h1 appReveal [revealDelay]="110">{{ p.name }}</h1>
+
+          @if (p.description) {
+            <p class="description" appReveal [revealDelay]="160">{{ p.description }}</p>
+          }
+
+          <div class="price" appReveal [revealDelay]="210">{{ p.price | number: '1.2-2' }}</div>
+
+          <span class="pill" [class.success]="p.stock > 0" [class.danger]="p.stock === 0" appReveal [revealDelay]="250">
+            {{ (p.stock > 0 ? 'productDetail.inStock' : 'productDetail.outOfStock') | translate }}
+          </span>
+
+          @if (p.stock > 0) {
+            <div class="buy-row" appReveal [revealDelay]="300">
+              <app-quantity-stepper [(value)]="quantity" [max]="p.stock" />
+
+              <button
+                type="button"
+                class="add-btn"
+                [appBtn]="added() ? 'secondary' : 'primary'"
+                [icon]="added() ? 'check' : 'cart'"
+                (click)="addToCart()"
+              >
+                {{ (added() ? 'productDetail.added' : 'productDetail.addToCart') | translate }}
+              </button>
+            </div>
+
+            @if (hasAdded()) {
+              <a class="cart-link" appBtn="secondary" icon="cart" routerLink="/cart">
+                {{ 'cart.title' | translate }}
+              </a>
+            }
+          }
+        </div>
+      </div>
+    }
   }
 </section>

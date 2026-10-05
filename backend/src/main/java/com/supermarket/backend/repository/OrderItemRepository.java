@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
@@ -17,4 +18,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             "GROUP BY oi.product.id, oi.product.name " +
             "ORDER BY SUM(oi.quantity) DESC")
     List<Object[]> findTopSellingProducts(@Param("excludedStatus") OrderStatus excludedStatus, Pageable pageable);
+
+    boolean existsByProductId(Long productId);
+
+    @Query("SELECT DISTINCT oi.product.id FROM OrderItem oi WHERE oi.product.id IN :productIds")
+    List<Long> findProductIdsWithOrders(@Param("productIds") Collection<Long> productIds);
 }

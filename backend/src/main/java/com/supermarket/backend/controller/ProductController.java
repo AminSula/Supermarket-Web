@@ -1,6 +1,8 @@
 package com.supermarket.backend.controller;
 
+import com.supermarket.backend.dto.ImageOrderRequest;
 import com.supermarket.backend.dto.ProductCreateRequest;
+import com.supermarket.backend.dto.ProductDeleteResponse;
 import com.supermarket.backend.dto.ProductResponse;
 import com.supermarket.backend.service.ProductImageService;
 import com.supermarket.backend.service.ProductService;
@@ -46,20 +48,28 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ProductDeleteResponse delete(@PathVariable Long id) {
+        return productService.deleteProduct(id);
     }
 
-    @PostMapping("/{id}/image")
-    public ResponseEntity<Void> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        productImageService.uploadImage(id, file);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/{id}/restore")
+    public ProductResponse restore(@PathVariable Long id) {
+        return productService.restoreProduct(id);
     }
 
-    @DeleteMapping("/{id}/image")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
-        productImageService.deleteImage(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/{id}/images")
+    public ResponseEntity<List<Long>> addImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        List<Long> imageIds = productImageService.addImage(id, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(imageIds);
+    }
+
+    @DeleteMapping("/{id}/images/{imageId}")
+    public List<Long> deleteImage(@PathVariable Long id, @PathVariable Long imageId) {
+        return productImageService.deleteImage(id, imageId);
+    }
+
+    @PutMapping("/{id}/images/order")
+    public List<Long> reorderImages(@PathVariable Long id, @Valid @RequestBody ImageOrderRequest request) {
+        return productImageService.reorder(id, request.getImageIds());
     }
 }

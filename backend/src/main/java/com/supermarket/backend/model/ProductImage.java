@@ -4,15 +4,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "product_images")
+@Table(name = "product_images", indexes = @Index(name = "idx_product_images_product", columnList = "product_id"))
 public class ProductImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column(name = "image_data", nullable = false, columnDefinition = "bytea")
@@ -20,6 +20,9 @@ public class ProductImage {
 
     @Column(nullable = false)
     private String contentType;
+
+    @Column(name = "sort_order", nullable = false, columnDefinition = "integer default 0")
+    private int sortOrder = 0;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
@@ -63,6 +66,14 @@ public class ProductImage {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public int getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     public LocalDateTime getUpdatedAt() {

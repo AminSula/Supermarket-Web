@@ -1,38 +1,56 @@
-<section class="dashboard">
-  <h1>{{ 'admin.dashboard.title' | translate }}</h1>
+<section class="dashboard page-fade-in">
+  <app-page-header icon="dashboard" [title]="'admin.dashboard.title' | translate" />
 
   @if (loading()) {
-    <p>{{ 'admin.dashboard.loading' | translate }}</p>
-  } @else if (errorMessage()) {
-    <p class="error">{{ errorMessage() }}</p>
-  } @else {
-    @if (summary(); as s) {
-      <div class="summary-cards">
-        <div class="card">
-          <span class="label">{{ 'admin.dashboard.today' | translate }}</span>
-          <span class="value">{{ s.revenueToday | number: '1.2-2' }}</span>
-          <span class="sub">{{ s.ordersToday }} {{ 'admin.dashboard.orders' | translate }}</span>
-        </div>
-        <div class="card">
-          <span class="label">{{ 'admin.dashboard.thisWeek' | translate }}</span>
-          <span class="value">{{ s.revenueThisWeek | number: '1.2-2' }}</span>
-          <span class="sub">{{ s.ordersThisWeek }} {{ 'admin.dashboard.orders' | translate }}</span>
-        </div>
-        <div class="card">
-          <span class="label">{{ 'admin.dashboard.thisMonth' | translate }}</span>
-          <span class="value">{{ s.revenueThisMonth | number: '1.2-2' }}</span>
-          <span class="sub">{{ s.ordersThisMonth }} {{ 'admin.dashboard.orders' | translate }}</span>
-        </div>
-      </div>
-    }
+    <p class="sr-only">{{ 'admin.dashboard.loading' | translate }}</p>
 
-    <div class="panel">
-      <h2>{{ 'admin.dashboard.revenueOverTime' | translate }}</h2>
-      <div class="chart">
-        @for (point of revenuePoints(); track point.date) {
-          <div class="bar-col" [title]="point.date + ': ' + (point.revenue | number: '1.2-2')">
+    <div class="summary-cards">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="card skeleton-card">
+          <app-skeleton width="44px" height="44px" radius="14px" />
+          <app-skeleton width="45%" height="0.7rem" />
+          <app-skeleton width="70%" height="1.9rem" />
+          <app-skeleton width="35%" height="0.7rem" />
+        </div>
+      }
+    </div>
+    <div class="panel skeleton-card">
+      <app-skeleton width="35%" height="1.1rem" />
+      <app-skeleton height="190px" radius="12px" />
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-box">
+      <app-icon name="alert" [size]="20" />
+      <span>{{ errorMessage() }}</span>
+    </div>
+  } @else {
+    <div class="summary-cards">
+      @for (c of cards(); track c.key; let i = $index) {
+        <div class="card" appReveal [revealDelay]="i * 90">
+          <span class="chip"><app-icon [name]="c.icon" [size]="22" /></span>
+          <span class="label">{{ 'admin.dashboard.' + c.key | translate }}</span>
+          <span class="value" [appCountUp]="c.revenue" [countDecimals]="2" [countDelay]="i * 90"></span>
+          <span class="sub">
+            <app-icon name="orders" [size]="15" />
+            <span><span [appCountUp]="c.orders" [countDelay]="i * 90 + 200"></span> {{ 'admin.dashboard.orders' | translate }}</span>
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="panel" appReveal [revealDelay]="120">
+      <div class="panel-head">
+        <span class="chip sm"><app-icon name="trend-up" [size]="18" /></span>
+        <h2>{{ 'admin.dashboard.revenueOverTime' | translate }}</h2>
+      </div>
+
+      <div class="chart" appInView>
+        @for (point of revenuePoints(); track point.date; let i = $index) {
+          <div class="bar-col" [style.--i]="i">
             <div class="bar-track">
-              <div class="bar" [style.height.%]="barHeight(point)"></div>
+              <div class="bar" [style.--h]="barHeight(point) + '%'">
+                <span class="bar-value">{{ point.revenue | number: '1.0-0' }}</span>
+              </div>
             </div>
             <span class="bar-label">{{ shortDate(point.date) }}</span>
           </div>
@@ -41,41 +59,68 @@
     </div>
 
     <div class="two-col">
-      <div class="panel">
-        <h2>{{ 'admin.dashboard.ordersByStatus' | translate }}</h2>
-        <ul class="status-list">
-          @for (item of statusCounts(); track item.status) {
-            <li>
-              <span>{{ ('admin.orders.status.' + item.status) | translate }}</span>
-              <span class="count">{{ item.count }}</span>
+      <div class="panel" appReveal [revealDelay]="80">
+        <div class="panel-head">
+          <span class="chip sm"><app-icon name="pie" [size]="18" /></span>
+          <h2>{{ 'admin.dashboard.ordersByStatus' | translate }}</h2>
+        </div>
+
+        <ul class="status-list" appInView>
+          @for (item of statusCounts(); track item.status; let i = $index) {
+            <li [attr.data-status]="item.status" [style.--i]="i" [style.--w]="statusShare(item) + '%'">
+              <div class="row-top">
+                <span class="status-icon"><app-icon [name]="statusIcon(item.status)" [size]="17" /></span>
+                <span class="status-name">{{ 'admin.orders.status.' + item.status | translate }}</span>
+                <span class="count" [appCountUp]="item.count" [countDelay]="i * 80"></span>
+              </div>
+              <div class="meter"><div class="fill"></div></div>
             </li>
           }
         </ul>
       </div>
 
-      <div class="panel">
-        <h2>{{ 'admin.dashboard.topProducts' | translate }}</h2>
+      <div class="panel" appReveal [revealDelay]="160">
+        <div class="panel-head">
+          <span class="chip sm"><app-icon name="star" [size]="18" /></span>
+          <h2>{{ 'admin.dashboard.topProducts' | translate }}</h2>
+        </div>
+
         @if (topProducts().length === 0) {
-          <p class="muted">{{ 'admin.dashboard.noSales' | translate }}</p>
+          <div class="empty">
+            <app-icon name="inbox" [size]="36" [stroke]="1.5" />
+            <p>{{ 'admin.dashboard.noSales' | translate }}</p>
+          </div>
         } @else {
-          <table>
-            <thead>
-              <tr>
-                <th>{{ 'admin.products.name' | translate }}</th>
-                <th>{{ 'admin.dashboard.sold' | translate }}</th>
-                <th>{{ 'admin.dashboard.revenue' | translate }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (product of topProducts(); track product.productId) {
+          <div class="table-wrap" appInView>
+            <table>
+              <thead>
                 <tr>
-                  <td>{{ product.productName }}</td>
-                  <td>{{ product.quantitySold }}</td>
-                  <td>{{ product.revenue | number: '1.2-2' }}</td>
+                  <th>{{ 'admin.products.name' | translate }}</th>
+                  <th class="num">{{ 'admin.dashboard.sold' | translate }}</th>
+                  <th class="num">{{ 'admin.dashboard.revenue' | translate }}</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (product of topProducts(); track product.productId; let i = $index) {
+                  <tr [style.--i]="i" [style.--w]="productShare(product) + '%'">
+                    <td>
+                      <div class="name-cell">
+                        <span class="rank" [class.top]="i === 0">{{ i + 1 }}</span>
+                        <div class="name">
+                          <span class="product-name">{{ product.productName }}</span>
+                          <div class="meter thin"><div class="fill"></div></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="num"><span [appCountUp]="product.quantitySold" [countDelay]="i * 80"></span></td>
+                    <td class="num">
+                      <span [appCountUp]="product.revenue" [countDecimals]="2" [countDelay]="i * 80"></span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       </div>
     </div>

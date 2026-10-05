@@ -9,11 +9,33 @@ import {
   RevenuePoint,
   TopProduct,
 } from '../../../core/models/dashboard.model';
+import { IconComponent, IconName } from '../../../shared/icon/icon';
+import { RevealDirective } from '../../../shared/reveal/reveal';
+import { CountUpDirective } from '../../../shared/count-up/count-up';
+import { InViewDirective } from '../../../shared/in-view/in-view';
+import { PageHeaderComponent } from '../../../shared/page-header/page-header';
+import { SkeletonComponent } from '../../../shared/sceleton/sceleton';
+
+interface SummaryCard {
+  key: 'today' | 'thisWeek' | 'thisMonth'; 
+  icon: IconName;
+  revenue: number;
+  orders: number;
+}
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    IconComponent,
+    RevealDirective,
+    CountUpDirective,
+    InViewDirective,
+    PageHeaderComponent,
+    SkeletonComponent,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -28,12 +50,21 @@ export class DashboardComponent implements OnInit {
   revenuePoints = signal<RevenuePoint[]>([]);
   statusCounts = signal<OrderStatusCount[]>([]);
 
-  // Tallest bar = 100% of the chart height; everything else scales against it.
-  // `|| 1` avoids dividing by zero when there's no revenue at all yet.
+  cards = computed<SummaryCard[]>(() => {
+    const s = this.summary();
+    if (!s) return [];
+    return [
+      { key: 'today', icon: 'clock', revenue: s.revenueToday, orders: s.ordersToday },
+      { key: 'thisWeek', icon: 'calendar', revenue: s.revenueThisWeek, orders: s.ordersThisWeek },
+      { key: 'thisMonth', icon: 'calendar-check', revenue: s.revenueThisMonth, orders: s.ordersThisMonth },
+    ];
+  });
+
   private maxRevenue = computed(() => Math.max(...this.revenuePoints().map((p) => p.revenue), 0) || 1);
+  private statusTotal = computed(() => this.statusCounts().reduce((sum, s) => sum + s.count, 0) || 1);
+  private topMax = computed(() => Math.max(...this.topProducts().map((p) => p.revenue), 0) || 1);
 
   ngOnInit() {
-    // All four are independent, so fetch them together.
     forkJoin({
       summary: this.dashboardService.summary(),
       topProducts: this.dashboardService.topProducts(5),
@@ -59,7 +90,24 @@ export class DashboardComponent implements OnInit {
     return (point.revenue / this.maxRevenue()) * 100;
   }
 
-  // "2026-09-27" -> "27/9" — compact enough to fit under each bar.
+  statusShare(item: OrderStatusCount): number {
+    return (item.count / this.statusTotal()) * 100;
+  }
+
+  productShare(product: TopProduct): number {
+    return (product.revenue / this.topMax()) * 100;
+  }
+
+  statusIcon(status: OrderStatusCount['status']): IconName {
+    const icons: Record<OrderStatusCount['status'], IconName> = {
+      PENDING: 'clock',
+      CONFIRMED: 'check-circle',
+      DELIVERED: 'truck',
+      CANCELLED: 'x-circle',
+    };
+    return icons[status];
+  }
+
   shortDate(isoDate: string): string {
     const [, month, day] = isoDate.split('-');
     return `${Number(day)}/${Number(month)}`;

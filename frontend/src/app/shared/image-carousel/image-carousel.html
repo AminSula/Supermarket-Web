@@ -1,0 +1,61 @@
+<div
+  class="carousel"
+  tabindex="0"
+  role="region"
+  aria-roledescription="carousel"
+  [attr.aria-label]="alt()"
+  (keydown)="onKey($event)"
+>
+  <div class="viewport">
+    <div #track class="track" (scroll)="onScroll()">
+      @for (url of urls(); track url; let i = $index) {
+        <div class="slide" [class.active]="i === active()" role="group" [attr.aria-label]="i + 1 + ' / ' + count()">
+          <img appLazy [src]="url" [alt]="alt()" draggable="false" />
+        </div>
+      }
+    </div>
+
+    @if (count() > 1) {
+      <button
+        type="button"
+        class="nav prev"
+        aria-label="Previous image"
+        [class.hidden]="active() === 0"
+        [disabled]="active() === 0"
+        (click)="prev()"
+      >
+        <app-icon name="chevron-left" [size]="22" [stroke]="2.2" />
+      </button>
+
+      <button
+        type="button"
+        class="nav next"
+        aria-label="Next image"
+        [class.hidden]="active() === count() - 1"
+        [disabled]="active() === count() - 1"
+        (click)="next()"
+      >
+        <app-icon name="chevron-right" [size]="22" [stroke]="2.2" />
+      </button>
+
+      <span class="counter">{{ active() + 1 }} / {{ count() }}</span>
+    }
+  </div>
+
+  @if (count() > 1) {
+    <div class="thumbs">
+      @for (url of urls(); track url; let i = $index) {
+        <button
+          type="button"
+          class="thumb"
+          [class.active]="i === active()"
+          [attr.aria-label]="'Image ' + (i + 1)"
+          [attr.aria-current]="i === active()"
+          (click)="goTo(i)"
+        >
+          <img [src]="url" alt="" loading="lazy" draggable="false" />
+        </button>
+      }
+    </div>
+  }
+</div>

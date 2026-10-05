@@ -1,64 +1,140 @@
-<section class="product-list">
-  <div class="header">
-    <h1>{{ 'admin.products.title' | translate }}</h1>
-    <a routerLink="/admin/products/new" class="btn">{{ 'admin.products.add' | translate }}</a>
-  </div>
+<section class="product-list page-fade-in">
+  <app-page-header icon="products" [title]="'admin.products.title' | translate">
+    <a appBtn="primary" icon="plus" routerLink="/admin/products/new">
+      {{ 'admin.products.add' | translate }}
+    </a>
+  </app-page-header>
+
+  @if (notice()) {
+    <div class="notice-box">
+      <app-icon name="info" [size]="20" />
+      <span>{{ notice() }}</span>
+      <button type="button" class="notice-close" aria-label="Dismiss" (click)="dismissNotice()">
+        <app-icon name="close" [size]="16" />
+      </button>
+    </div>
+  }
 
   @if (loading()) {
-    <p>{{ 'admin.products.loading' | translate }}</p>
-  } @else if (products().length === 0) {
-    <p>{{ 'admin.products.empty' | translate }}</p>
-  } @else {
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>{{ 'admin.products.name' | translate }}</th>
-          <th>{{ 'admin.products.price' | translate }}</th>
-          <th>{{ 'admin.products.stock' | translate }}</th>
-          <th>{{ 'admin.products.status' | translate }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (product of products(); track product.id) {
-          <tr [class.inactive]="!product.active">
-            <td>
-              @if (product.hasImage) {
-                <img class="thumb" [src]="productService.imageUrl(product.id)" alt="" />
-              }
-            </td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.price | number: '1.2-2' }}</td>
-            <td>{{ product.stock }}</td>
-            <td>
-              {{ (product.active ? 'admin.products.active' : 'admin.products.inactive') | translate }}
-            </td>
-            <td class="actions">
-              <a [routerLink]="['/admin/products', product.id, 'edit']">
-                {{ 'admin.products.edit' | translate }}
-              </a>
-              @if (product.active) {
-                <button type="button" (click)="askDelete(product.id)">
-                  {{ 'admin.products.delete' | translate }}
-                </button>
-              }
-            </td>
-          </tr>
+    <p class="sr-only">{{ 'admin.products.loading' | translate }}</p>
+    <div class="table-card">
+      <div class="skeleton-rows">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <app-skeleton height="56px" radius="12px" />
         }
-      </tbody>
-    </table>
+      </div>
+    </div>
+  } @else if (products().length === 0) {
+    <div class="table-card empty-state">
+      <span class="empty-icon"><app-icon name="products" [size]="30" [stroke]="1.5" /></span>
+      <p>{{ 'admin.products.empty' | translate }}</p>
+      <a appBtn="primary" icon="plus" routerLink="/admin/products/new">
+        {{ 'admin.products.add' | translate }}
+      </a>
+    </div>
+  } @else {
+    <!-- The Archived tab only appears while at least one product is archived -->
+    @if (archivedProducts().length > 0) {
+      <div class="tabs" role="tablist" [attr.data-active]="filter()">
+        <span class="thumb"></span>
+        <button type="button" role="tab" [class.active]="filter() === 'active'" (click)="setFilter('active')">
+          {{ 'admin.products.active' | translate }}
+          <span class="count">{{ activeProducts().length }}</span>
+        </button>
+        <button type="button" role="tab" [class.active]="filter() === 'archived'" (click)="setFilter('archived')">
+          {{ t('admin.products.archived', 'Archived') }}
+          <span class="count">{{ archivedProducts().length }}</span>
+        </button>
+      </div>
+    }
+
+    @if (visibleProducts().length === 0) {
+      <div class="table-card empty-state">
+        <span class="empty-icon"><app-icon name="products" [size]="30" [stroke]="1.5" /></span>
+        <p>{{ 'admin.products.empty' | translate }}</p>
+        <a appBtn="primary" icon="plus" routerLink="/admin/products/new">
+          {{ 'admin.products.add' | translate }}
+        </a>
+      </div>
+    } @else {
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>{{ 'admin.products.name' | translate }}</th>
+              <th class="num">{{ 'admin.products.price' | translate }}</th>
+              <th class="num">{{ 'admin.products.stock' | translate }}</th>
+              <th>{{ 'admin.products.status' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of visibleProducts(); track product.id; let i = $index) {
+              <tr appReveal="fade" [revealDelay]="i < 12 ? i * 45 : 0" [class.inactive]="!product.active">
+                <td class="thumb-cell">
+                  <div class="thumb-wrap">
+                    @if (product.imageIds.length > 0) {
+                      <img appLazy [src]="productService.imageUrl(product.id, product.imageIds[0])" alt="" />
+                      @if (product.imageIds.length > 1) {
+                        <span class="more">+{{ product.imageIds.length - 1 }}</span>
+                      }
+                    } @else {
+                      <app-icon name="image" [size]="20" [stroke]="1.5" />
+                    }
+                  </div>
+                </td>
+                <td class="name">{{ product.name }}</td>
+                <td class="num price">{{ product.price | number: '1.2-2' }}</td>
+                <td class="num" [class.stock-zero]="product.stock === 0">{{ product.stock }}</td>
+                <td>
+                  <span class="pill" [class.success]="product.active">
+                    {{ product.active ? ('admin.products.active' | translate) : t('admin.products.archived', 'Archived') }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  @if (!product.active) {
+                    <button
+                      type="button"
+                      appBtn="edit"
+                      icon="restore"
+                      [loading]="restoringId() === product.id"
+                      [disabled]="restoringId() === product.id"
+                      (click)="restore(product)"
+                    >
+                      {{ t('admin.products.restore', 'Restore') }}
+                    </button>
+                  }
+                  <a appBtn="edit" icon="edit" [routerLink]="['/admin/products', product.id, 'edit']">
+                    {{ 'admin.products.edit' | translate }}
+                  </a>
+                  <!-- An archived product that appears in past orders must stay; one that doesn't can be erased -->
+                  @if (product.active || !product.hasOrders) {
+                    <button type="button" appBtn="delete" icon="trash" (click)="askDelete(product.id)">
+                      {{ 'admin.products.delete' | translate }}
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   }
 
   @if (errorMessage()) {
-    <p class="error">{{ errorMessage() }}</p>
+    <div class="error-box">
+      <app-icon name="alert" [size]="20" />
+      <span>{{ errorMessage() }}</span>
+    </div>
   }
 </section>
 
 <app-confirm-dialog
   [open]="pendingDeleteId() !== null"
   [title]="'admin.products.deleteTitle' | translate"
-  [message]="'admin.products.deleteMessage' | translate"
+  [message]="deleteMessage()"
   [confirmLabel]="'admin.products.delete' | translate"
   [cancelLabel]="'common.cancel' | translate"
   (confirmed)="confirmDelete()"

@@ -6,11 +6,24 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CartService } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
 import { OrderResponse } from '../../core/models/order.model';
+import { ButtonComponent } from '../../shared/button/button';
+import { IconComponent } from '../../shared/icon/icon';
+import { PageHeaderComponent } from '../../shared/page-header/page-header';
+import { RevealDirective } from '../../shared/reveal/reveal';
 
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    TranslateModule,
+    ButtonComponent,
+    IconComponent,
+    PageHeaderComponent,
+    RevealDirective,
+  ],
   templateUrl: './checkout-page.html',
   styleUrl: './checkout-page.scss',
 })
@@ -29,6 +42,16 @@ export class CheckoutPageComponent {
     address: ['', Validators.required],
     notes: [''],
   });
+
+  invalid(name: string): boolean {
+    const control = this.form.get(name);
+    return !!control && control.invalid && control.touched;
+  }
+
+  ok(name: string): boolean {
+    const control = this.form.get(name);
+    return !!control && control.valid && control.dirty;
+  }
 
   submit() {
     if (this.form.invalid || this.cartService.cartItems().length === 0) {
@@ -60,7 +83,6 @@ export class CheckoutPageComponent {
         },
         error: (err) => {
           this.submitting.set(false);
-          // Most likely a 409 (stock changed since it was added to cart) or a 404 (product removed).
           this.errorMessage.set(err?.error?.error ?? 'Something went wrong. Please try again.');
         },
       });

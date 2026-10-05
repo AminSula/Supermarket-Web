@@ -5,11 +5,26 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CategoryService } from '../../../core/services/category.service';
 import { CategoryResponse } from '../../../core/models/category.model';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog';
+import { ButtonComponent } from '../../../shared/button/button';
+import { IconComponent } from '../../../shared/icon/icon';
+import { PageHeaderComponent } from '../../../shared/page-header/page-header';
+import { RevealDirective } from '../../../shared/reveal/reveal';
+import { SkeletonComponent } from '../../../shared/sceleton/sceleton';
 
 @Component({
   selector: 'app-category-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule, ConfirmDialogComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    TranslateModule,
+    ConfirmDialogComponent,
+    ButtonComponent,
+    IconComponent,
+    PageHeaderComponent,
+    RevealDirective,
+    SkeletonComponent,
+  ],
   templateUrl: './category-list.html',
   styleUrl: './category-list.scss',
 })
@@ -20,7 +35,6 @@ export class CategoryListComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal<string | null>(null);
 
-  // Which category (if any) the confirm modal is currently asking about.
   pendingDeleteId = signal<number | null>(null);
 
   ngOnInit() {
@@ -65,7 +79,6 @@ export class CategoryListComponent implements OnInit {
         this.load();
       },
       error: (err) => {
-        // Most likely a 409: category still referenced by products.
         this.pendingDeleteId.set(null);
         this.errorMessage.set(err?.error?.error ?? 'Could not delete this category.');
       },

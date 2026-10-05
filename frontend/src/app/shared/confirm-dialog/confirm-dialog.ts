@@ -1,16 +1,16 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent } from '../button/button';
+import { IconComponent } from '../icon/icon';
 
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, IconComponent],
   templateUrl: './confirm-dialog.html',
   styleUrl: './confirm-dialog.scss',
 })
 export class ConfirmDialogComponent {
-  // Controlled by the parent via a signal/boolean — this component has no
-  // open/close state of its own, it just renders (or doesn't) based on `open`.
   @Input() open = false;
   @Input() title = '';
   @Input() message = '';
@@ -19,4 +19,11 @@ export class ConfirmDialogComponent {
 
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.open) {
+      this.cancelled.emit();
+    }
+  }
 }

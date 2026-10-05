@@ -35,9 +35,6 @@ export class CategoryService {
     return this.http.delete<void>(`${this.adminUrl}/${id}`);
   }
 
-  // Used by the product form's category dropdown — resolved names only.
-  // Same one-time retry as ProductService.listPublic, for the same reason:
-  // this fires in parallel with the products request on catalog page load.
   listPublic(lang: 'EN' | 'AL' = 'AL'): Observable<CategoryPublicResponse[]> {
     return this.http
       .get<CategoryPublicResponse[]>(this.publicUrl, { params: { lang } })

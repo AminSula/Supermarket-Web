@@ -15,7 +15,7 @@ export interface TopProduct {
 }
 
 export interface RevenuePoint {
-  date: string; // ISO date, e.g. "2026-09-27"
+  date: string; 
   revenue: number;
 }
 

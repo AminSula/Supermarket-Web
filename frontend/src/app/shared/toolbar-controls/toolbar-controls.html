@@ -1,0 +1,16 @@
+<div class="lang-switch" role="group" [attr.data-lang]="prefs.lang()">
+  <span class="thumb"></span>
+  <button type="button" (click)="prefs.switchLang('al')" [class.active]="prefs.lang() === 'al'">AL</button>
+  <button type="button" (click)="prefs.switchLang('en')" [class.active]="prefs.lang() === 'en'">EN</button>
+</div>
+
+<button
+  type="button"
+  class="icon-btn theme-toggle"
+  [class.dark]="prefs.theme() === 'dark'"
+  aria-label="Toggle theme"
+  (click)="prefs.toggleTheme()"
+>
+  <app-icon class="moon" name="moon" [size]="20" />
+  <app-icon class="sun" name="sun" [size]="20" />
+</button>

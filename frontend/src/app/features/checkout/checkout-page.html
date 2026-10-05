@@ -1,69 +1,114 @@
-<section class="checkout-page">
+<section class="checkout-page page-fade-in">
   @if (completedOrder(); as order) {
     <div class="confirmation">
+      <span class="success-badge"><app-icon name="check" [size]="38" [stroke]="2.4" /></span>
       <h1>{{ 'checkout.thankYou' | translate }}</h1>
-      <p>{{ 'checkout.orderNumber' | translate }} #{{ order.id }}</p>
+      <span class="order-pill">{{ 'checkout.orderNumber' | translate }} #{{ order.id }}</span>
 
       <ul class="items">
         @for (item of order.items; track item.productId) {
-          <li>{{ item.quantity }}x {{ item.productName }} — {{ item.subtotal | number: '1.2-2' }}</li>
+          <li>
+            <span class="qty">{{ item.quantity }}×</span>
+            <span class="item-name">{{ item.productName }}</span>
+            <span class="item-sub">{{ item.subtotal | number: '1.2-2' }}</span>
+          </li>
         }
       </ul>
 
-      <div class="total">{{ 'checkout.total' | translate }}: {{ order.totalAmount | number: '1.2-2' }}</div>
-      <p class="payment-note">{{ 'checkout.cashOnDelivery' | translate }}</p>
+      <div class="total-line">
+        <span>{{ 'checkout.total' | translate }}</span>
+        <strong>{{ order.totalAmount | number: '1.2-2' }}</strong>
+      </div>
 
-      <a routerLink="/" class="btn">{{ 'checkout.backToShopping' | translate }}</a>
+      <p class="payment-note"><app-icon name="money" [size]="18" />{{ 'checkout.cashOnDelivery' | translate }}</p>
+
+      <a appBtn="primary" icon="store" routerLink="/">{{ 'checkout.backToShopping' | translate }}</a>
     </div>
   } @else if (cartService.cartItems().length === 0) {
-    <p>{{ 'checkout.emptyCart' | translate }}</p>
-    <a routerLink="/" class="btn">{{ 'cart.continueShopping' | translate }}</a>
-  } @else {
-    <h1>{{ 'checkout.title' | translate }}</h1>
-
-    <div class="summary">
-      @for (item of cartService.cartItems(); track item.productId) {
-        <div class="line">
-          <span>{{ item.quantity }}x {{ item.name }}</span>
-          <span>{{ item.price * item.quantity | number: '1.2-2' }}</span>
-        </div>
-      }
-      <div class="line total">
-        <span>{{ 'cart.total' | translate }}</span>
-        <span>{{ cartService.total() | number: '1.2-2' }}</span>
-      </div>
+    <div class="table-card empty-state">
+      <span class="empty-icon"><app-icon name="cart" [size]="30" [stroke]="1.5" /></span>
+      <p>{{ 'checkout.emptyCart' | translate }}</p>
+      <a appBtn="primary" icon="arrow-left" routerLink="/">{{ 'cart.continueShopping' | translate }}</a>
     </div>
+  } @else {
+    <app-page-header icon="orders" [title]="'checkout.title' | translate" />
 
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <label>
-        {{ 'checkout.name' | translate }}
-        <input type="text" formControlName="customerName" />
-      </label>
+    <div class="checkout-layout">
+      <form class="form-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-grid">
+          <div class="field full" [class.invalid]="invalid('customerName')" appReveal>
+            <label class="field-label" for="co-name">{{ 'checkout.name' | translate }}</label>
+            <div class="control">
+              <app-icon class="lead" name="user" [size]="18" />
+              <input id="co-name" type="text" formControlName="customerName" autocomplete="name" />
+              @if (ok('customerName')) {
+                <app-icon class="ok" name="check-circle" [size]="19" />
+              }
+            </div>
+          </div>
 
-      <label>
-        {{ 'checkout.phone' | translate }}
-        <input type="tel" formControlName="phone" />
-      </label>
+          <div class="field full" [class.invalid]="invalid('phone')" appReveal [revealDelay]="60">
+            <label class="field-label" for="co-phone">{{ 'checkout.phone' | translate }}</label>
+            <div class="control">
+              <app-icon class="lead" name="phone" [size]="18" />
+              <input id="co-phone" type="tel" formControlName="phone" autocomplete="tel" />
+              @if (ok('phone')) {
+                <app-icon class="ok" name="check-circle" [size]="19" />
+              }
+            </div>
+          </div>
 
-      <label>
-        {{ 'checkout.address' | translate }}
-        <textarea formControlName="address" rows="2"></textarea>
-      </label>
+          <div class="field full" [class.invalid]="invalid('address')" appReveal [revealDelay]="120">
+            <label class="field-label" for="co-address">{{ 'checkout.address' | translate }}</label>
+            <div class="control area">
+              <app-icon class="lead" name="pin" [size]="18" />
+              <textarea id="co-address" formControlName="address" rows="2" autocomplete="street-address"></textarea>
+            </div>
+          </div>
 
-      <label>
-        {{ 'checkout.notes' | translate }}
-        <textarea formControlName="notes" rows="2"></textarea>
-      </label>
+          <div class="field full" appReveal [revealDelay]="180">
+            <label class="field-label" for="co-notes">{{ 'checkout.notes' | translate }}</label>
+            <div class="control area">
+              <app-icon class="lead" name="info" [size]="18" />
+              <textarea id="co-notes" formControlName="notes" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
 
-      <p class="payment-note">{{ 'checkout.cashOnDelivery' | translate }}</p>
+        <p class="payment-note"><app-icon name="money" [size]="18" />{{ 'checkout.cashOnDelivery' | translate }}</p>
 
-      <button type="submit" [disabled]="submitting()">
-        {{ submitting() ? ('checkout.placing' | translate) : ('checkout.placeOrder' | translate) }}
-      </button>
+        @if (errorMessage()) {
+          <div class="error-box">
+            <app-icon name="alert" [size]="20" />
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
 
-      @if (errorMessage()) {
-        <p class="error">{{ errorMessage() }}</p>
-      }
-    </form>
+        <div class="form-actions">
+          <button type="submit" class="place-btn" appBtn="primary" icon="check" [loading]="submitting()" [disabled]="submitting()">
+            {{ submitting() ? ('checkout.placing' | translate) : ('checkout.placeOrder' | translate) }}
+          </button>
+        </div>
+      </form>
+
+      <aside class="summary" appReveal="right" [revealDelay]="100">
+        <h2>{{ 'cart.title' | translate }}</h2>
+
+        <ul class="lines">
+          @for (item of cartService.cartItems(); track item.productId) {
+            <li>
+              <span class="qty">{{ item.quantity }}×</span>
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-sub">{{ item.price * item.quantity | number: '1.2-2' }}</span>
+            </li>
+          }
+        </ul>
+
+        <div class="total-line">
+          <span>{{ 'cart.total' | translate }}</span>
+          <strong>{{ cartService.total() | number: '1.2-2' }}</strong>
+        </div>
+      </aside>
+    </div>
   }
 </section>

@@ -3,7 +3,7 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  stock: number; // used to cap quantity adjustments client-side
+  stock: number; 
 }
 
 export interface OrderItemRequest {

@@ -1,23 +1,49 @@
-<section class="login">
-  <h1>{{ 'admin.login.title' | translate }}</h1>
+<section class="login-page page-fade-in">
+  <div class="login-card">
+    <span class="login-badge"><app-icon name="lock" [size]="26" [stroke]="2" /></span>
+    <h1>{{ 'admin.login.title' | translate }}</h1>
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <label>
-      {{ 'admin.login.username' | translate }}
-      <input type="text" formControlName="username" autocomplete="username" />
-    </label>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field" [class.invalid]="invalid('username')" appReveal>
+        <label class="field-label" for="login-username">{{ 'admin.login.username' | translate }}</label>
+        <div class="control">
+          <app-icon class="lead" name="user" [size]="18" />
+          <input id="login-username" type="text" formControlName="username" autocomplete="username" />
+        </div>
+      </div>
 
-    <label>
-      {{ 'admin.login.password' | translate }}
-      <input type="password" formControlName="password" autocomplete="current-password" />
-    </label>
+      <div class="field" [class.invalid]="invalid('password')" appReveal [revealDelay]="80">
+        <label class="field-label" for="login-password">{{ 'admin.login.password' | translate }}</label>
+        <div class="control">
+          <app-icon class="lead" name="lock" [size]="18" />
+          <input
+            id="login-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="toggle"
+            [attr.aria-pressed]="showPassword()"
+            aria-label="Show or hide password"
+            (click)="showPassword.set(!showPassword())"
+          >
+            <app-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="18" />
+          </button>
+        </div>
+      </div>
 
-    <button type="submit" [disabled]="submitting()">
-      {{ submitting() ? ('admin.login.loggingIn' | translate) : ('admin.login.login' | translate) }}
-    </button>
+      @if (errorMessage()) {
+        <div class="error-box">
+          <app-icon name="alert" [size]="20" />
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
 
-    @if (errorMessage()) {
-      <p class="error">{{ errorMessage() }}</p>
-    }
-  </form>
+      <button type="submit" class="submit" appBtn="primary" icon="login" [loading]="submitting()" [disabled]="submitting()">
+        {{ submitting() ? ('admin.login.loggingIn' | translate) : ('admin.login.login' | translate) }}
+      </button>
+    </form>
+  </div>
 </section>

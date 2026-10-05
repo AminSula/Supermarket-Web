@@ -2,6 +2,7 @@ package com.supermarket.backend.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProductResponse {
 
@@ -13,6 +14,8 @@ public class ProductResponse {
     private Long categoryId;
     private boolean active;
     private boolean hasImage;
+    private List<Long> imageIds;
+    private boolean hasOrders;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -21,7 +24,7 @@ public class ProductResponse {
 
     public ProductResponse(Long id, String name, String description, BigDecimal price,
                            Integer stock, Long categoryId, boolean active, boolean hasImage,
-                           LocalDateTime createdAt, LocalDateTime updatedAt) {
+                           List<Long> imageIds, boolean hasOrders, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -30,6 +33,8 @@ public class ProductResponse {
         this.categoryId = categoryId;
         this.active = active;
         this.hasImage = hasImage;
+        this.imageIds = imageIds;
+        this.hasOrders = hasOrders;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -96,6 +101,22 @@ public class ProductResponse {
 
     public void setHasImage(boolean hasImage) {
         this.hasImage = hasImage;
+    }
+
+    public List<Long> getImageIds() {
+        return imageIds;
+    }
+
+    public void setImageIds(List<Long> imageIds) {
+        this.imageIds = imageIds;
+    }
+
+    public boolean isHasOrders() {
+        return hasOrders;
+    }
+
+    public void setHasOrders(boolean hasOrders) {
+        this.hasOrders = hasOrders;
     }
 
     public LocalDateTime getCreatedAt() {

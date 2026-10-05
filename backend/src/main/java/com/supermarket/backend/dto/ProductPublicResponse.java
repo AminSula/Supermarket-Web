@@ -1,6 +1,7 @@
 package com.supermarket.backend.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductPublicResponse {
 
@@ -12,12 +13,14 @@ public class ProductPublicResponse {
     private Long categoryId;
     private String categoryName;
     private boolean hasImage;
+    private List<Long> imageIds;
 
     public ProductPublicResponse() {
     }
 
     public ProductPublicResponse(Long id, String name, String description, BigDecimal price,
-                                 Integer stock, Long categoryId, String categoryName, boolean hasImage) {
+                                 Integer stock, Long categoryId, String categoryName, boolean hasImage,
+                                 List<Long> imageIds) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,6 +29,7 @@ public class ProductPublicResponse {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.hasImage = hasImage;
+        this.imageIds = imageIds;
     }
 
     public Long getId() {
@@ -90,5 +94,13 @@ public class ProductPublicResponse {
 
     public void setHasImage(boolean hasImage) {
         this.hasImage = hasImage;
+    }
+
+    public List<Long> getImageIds() {
+        return imageIds;
+    }
+
+    public void setImageIds(List<Long> imageIds) {
+        this.imageIds = imageIds;
     }
 }

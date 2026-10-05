@@ -1,52 +1,82 @@
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes badge-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--danger-soft);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 17, 31, 0.55);
+  backdrop-filter: blur(4px);
+  animation: overlay-in 0.2s ease both;
 }
 
 .dialog {
+  width: min(92vw, 400px);
+  padding: 1.9rem 1.75rem 1.6rem;
+  text-align: center;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1.5rem;
-  max-width: 360px;
-  width: 90%;
+  border-radius: 22px;
+  box-shadow: var(--shadow-hover);
+  animation: dialog-in 0.38s var(--ease-spring) both;
+
+  .icon-badge {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: var(--danger-soft);
+    color: var(--danger);
+    animation: badge-ring 1.4s ease-out 0.3s 2;
+  }
 
   h2 {
     margin: 0 0 0.5rem;
-    font-size: 1.05rem;
+    font-size: 1.15rem;
   }
 
   p {
-    margin: 0 0 1.25rem;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+    margin: 0 0 1.5rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
 
   .actions {
     display: flex;
-    justify-content: flex-end;
     gap: 0.75rem;
-  }
 
-  button {
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-  }
-
-  .confirm {
-    background: #d64545;
-    border-color: #d64545;
-    color: #fff;
-    font-weight: 600;
+    button {
+      flex: 1;
+    }
   }
 }

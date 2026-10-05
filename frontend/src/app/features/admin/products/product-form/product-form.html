@@ -1,86 +1,256 @@
-<section class="product-form">
-  <h1>
-    {{ (editingId() ? 'admin.products.editTitle' : 'admin.products.addTitle') | translate }}
-  </h1>
+<section class="product-form page-fade-in">
+  <app-page-header
+    icon="products"
+    [title]="(editingId() ? 'admin.products.editTitle' : 'admin.products.addTitle') | translate"
+  />
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <label>
-      {{ 'admin.addProduct.name' | translate }}
-      <input type="text" formControlName="name" />
-      @if (form.get('name')?.invalid && form.get('name')?.touched) {
-        <span class="error">{{ 'admin.addProduct.nameRequired' | translate }}</span>
-      }
-    </label>
-
-    <label>
-      {{ 'admin.addProduct.description' | translate }}
-      <textarea formControlName="description" rows="3"></textarea>
-    </label>
-
-    <label>
-      {{ 'admin.addProduct.price' | translate }}
-      <input type="number" step="0.01" formControlName="price" />
-      @if (form.get('price')?.invalid && form.get('price')?.touched) {
-        <span class="error">{{ 'admin.addProduct.priceInvalid' | translate }}</span>
-      }
-    </label>
-
-    <label>
-      {{ 'admin.addProduct.stock' | translate }}
-      <input type="number" formControlName="stock" />
-      @if (form.get('stock')?.invalid && form.get('stock')?.touched) {
-        <span class="error">{{ 'admin.addProduct.stockInvalid' | translate }}</span>
-      }
-    </label>
-
-    <label>
-      {{ 'admin.addProduct.categoryId' | translate }}
-      <select formControlName="categoryId">
-        <option [ngValue]="null" disabled>{{ 'admin.addProduct.categoryPlaceholder' | translate }}</option>
-        @for (category of categories(); track category.id) {
-          <option [ngValue]="category.id">{{ category.name }}</option>
+  <form class="form-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid">
+      <!-- Name -->
+      <div class="field full" [class.invalid]="invalid('name')" appReveal>
+        <label class="field-label" for="p-name">{{ 'admin.addProduct.name' | translate }}</label>
+        <div class="control">
+          <app-icon class="lead" name="tag" [size]="18" />
+          <input id="p-name" type="text" formControlName="name" autocomplete="off" />
+          @if (ok('name')) {
+            <app-icon class="ok" name="check-circle" [size]="19" />
+          }
+        </div>
+        @if (invalid('name')) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ 'admin.addProduct.nameRequired' | translate }}
+          </span>
         }
-      </select>
-      @if (form.get('categoryId')?.invalid && form.get('categoryId')?.touched) {
-        <span class="error">{{ 'admin.addProduct.categoryRequired' | translate }}</span>
-      }
-    </label>
+      </div>
 
-    <div class="image-field">
-      <span class="image-label">{{ 'admin.products.image' | translate }}</span>
+      <!-- Description -->
+      <div class="field full" appReveal [revealDelay]="60">
+        <label class="field-label" for="p-desc">{{ 'admin.addProduct.description' | translate }}</label>
+        <div class="control area">
+          <app-icon class="lead" name="orders" [size]="18" />
+          <textarea id="p-desc" formControlName="description" rows="3"></textarea>
+        </div>
+      </div>
 
-      @if (previewUrl()) {
-        <!-- A newly picked file, not yet uploaded -->
-        <img class="preview" [src]="previewUrl()" alt="" />
-        <button type="button" class="link-btn" (click)="clearSelectedFile()">
-          {{ 'admin.products.imageCancel' | translate }}
-        </button>
-      } @else if (existingImage() && editingId()) {
-        <!-- The image already saved on the server -->
-        <img class="preview" [src]="imageUrl(editingId()!)" alt="" />
-        <button type="button" class="link-btn danger" (click)="removeExistingImage()">
-          {{ 'admin.products.imageRemove' | translate }}
-        </button>
-      } @else {
-        <p class="no-image">{{ 'admin.products.imageNone' | translate }}</p>
-      }
+      <!-- Price -->
+      <div class="field" [class.invalid]="invalid('price')" appReveal [revealDelay]="120">
+        <label class="field-label" for="p-price">{{ 'admin.addProduct.price' | translate }}</label>
+        <div class="control">
+          <app-icon class="lead" name="money" [size]="18" />
+          <input id="p-price" type="number" step="0.01" formControlName="price" />
+          @if (ok('price')) {
+            <app-icon class="ok" name="check-circle" [size]="19" />
+          }
+        </div>
+        @if (invalid('price')) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ 'admin.addProduct.priceInvalid' | translate }}
+          </span>
+        }
+      </div>
 
-      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" />
+      <!-- Stock -->
+      <div class="field" [class.invalid]="invalid('stock')" appReveal [revealDelay]="180">
+        <label class="field-label" for="p-stock">{{ 'admin.addProduct.stock' | translate }}</label>
+        <div class="control">
+          <app-icon class="lead" name="products" [size]="18" />
+          <input id="p-stock" type="number" formControlName="stock" />
+          @if (ok('stock')) {
+            <app-icon class="ok" name="check-circle" [size]="19" />
+          }
+        </div>
+        @if (invalid('stock')) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ 'admin.addProduct.stockInvalid' | translate }}
+          </span>
+        }
+      </div>
 
-      @if (imageError()) {
-        <span class="error">{{ imageError() }}</span>
-      }
+      <!-- Category (custom dropdown) -->
+      <div class="field full" appReveal [revealDelay]="240">
+        <span class="field-label">{{ 'admin.addProduct.categoryId' | translate }}</span>
+        <app-select
+          formControlName="categoryId"
+          [options]="categoryOptions()"
+          [placeholder]="'admin.addProduct.categoryPlaceholder' | translate"
+          [ariaLabel]="'admin.addProduct.categoryId' | translate"
+        />
+        @if (invalid('categoryId')) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ 'admin.addProduct.categoryRequired' | translate }}
+          </span>
+        }
+      </div>
+
+      <!-- Images (up to 5) -->
+      <div
+        class="field full image-field"
+        [class.dragging]="dragging()"
+        appReveal
+        [revealDelay]="300"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+      >
+        <div class="image-head">
+          <span class="field-label">{{ 'admin.products.image' | translate }}</span>
+          <span class="pill info count">{{ totalImages() }} / {{ maxImages }}</span>
+        </div>
+
+        <!-- One hidden picker shared by the big drop zone and the small "Add image" button -->
+        <input
+          #fileInput
+          class="file-input"
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp"
+          (change)="onFilesSelected($event)"
+        />
+
+        @if (totalImages() === 0) {
+          <!-- No images yet: the big, inviting drop zone -->
+          <div
+            class="dropzone"
+            role="button"
+            tabindex="0"
+            (click)="openPicker()"
+            (keydown.enter)="openPicker()"
+            (keydown.space)="openPicker(); $event.preventDefault()"
+          >
+            <app-icon class="dz-icon" name="upload" [size]="26" />
+            <span class="dz-title">{{ t('admin.products.addImage', 'Add image') }}</span>
+            <span class="dz-hint">
+              {{ t('admin.products.imagesLimit', 'Up to 5 images') }} · JPEG · PNG · WebP · 5 MB
+            </span>
+          </div>
+        } @else {
+          <!-- Has images: a tidy grid of tiles, plus a small button (same size as Delete) to add more -->
+          <div class="tiles">
+            @for (imageId of imageIds(); track imageId; let i = $index) {
+              <div class="tile" [class.busy]="isBusy(imageId)">
+                <img appLazy [src]="imageUrl(imageId)" alt="" />
+
+                @if (i === 0) {
+                  <span class="badge cover">
+                    <app-icon name="star" [size]="12" [stroke]="2.4" />
+                    {{ t('admin.products.cover', 'Cover') }}
+                  </span>
+                }
+
+                <div class="tile-actions">
+                  @if (i > 0) {
+                    <button
+                      type="button"
+                      class="tile-btn"
+                      [title]="t('admin.products.setCover', 'Set as cover')"
+                      [attr.aria-label]="t('admin.products.setCover', 'Set as cover')"
+                      (click)="makeCover(imageId)"
+                    >
+                      <app-icon name="star" [size]="15" />
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="tile-btn danger"
+                    [title]="t('admin.products.removeImage', 'Remove image')"
+                    [attr.aria-label]="t('admin.products.removeImage', 'Remove image')"
+                    (click)="removeImage(imageId)"
+                  >
+                    <app-icon name="trash" [size]="15" />
+                  </button>
+                </div>
+
+                @if (isBusy(imageId)) {
+                  <span class="tile-spinner"></span>
+                }
+              </div>
+            }
+
+            @for (p of pending(); track p.localId; let j = $index) {
+              <div class="tile pending" [class.busy]="p.status === 'uploading'">
+                <img [src]="p.url" alt="" />
+
+                @if (imageIds().length === 0 && j === 0) {
+                  <span class="badge cover">
+                    <app-icon name="star" [size]="12" [stroke]="2.4" />
+                    {{ t('admin.products.cover', 'Cover') }}
+                  </span>
+                } @else {
+                  <span class="badge fresh">{{ t('admin.products.newImage', 'New') }}</span>
+                }
+
+                @if (p.status === 'queued') {
+                  <div class="tile-actions">
+                    @if (imageIds().length === 0 && j > 0) {
+                      <button
+                        type="button"
+                        class="tile-btn"
+                        [title]="t('admin.products.setCover', 'Set as cover')"
+                        [attr.aria-label]="t('admin.products.setCover', 'Set as cover')"
+                        (click)="makePendingCover(p.localId)"
+                      >
+                        <app-icon name="star" [size]="15" />
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="tile-btn danger"
+                      [title]="t('admin.products.removeImage', 'Remove image')"
+                      [attr.aria-label]="t('admin.products.removeImage', 'Remove image')"
+                      (click)="removePending(p.localId)"
+                    >
+                      <app-icon name="close" [size]="15" />
+                    </button>
+                  </div>
+                } @else {
+                  <span class="tile-spinner"></span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="image-toolbar">
+            <button type="button" appBtn="edit" icon="plus" [disabled]="!canAddMore()" (click)="openPicker()">
+              {{ t('admin.products.addImage', 'Add image') }}
+            </button>
+            <span class="hint">
+              {{
+                canAddMore()
+                  ? t('admin.products.imagesLimit', 'Up to 5 images') + ' · JPEG · PNG · WebP · 5 MB'
+                  : t('admin.products.limitReached', 'You can add up to 5 images per product.')
+              }}
+            </span>
+          </div>
+        }
+
+        @if (imageError()) {
+          <span class="field-error">
+            <app-icon name="alert" [size]="14" />
+            {{ imageError() }}
+          </span>
+        }
+      </div>
     </div>
 
-    <button type="submit" [disabled]="submitting()">
-      {{ submitting() ? ('admin.addProduct.saving' | translate) : ('admin.addProduct.save' | translate) }}
-    </button>
-
     @if (successMessage()) {
-      <p class="success">{{ successMessage() }}</p>
+      <p class="success-text">{{ successMessage() }}</p>
     }
     @if (errorMessage()) {
-      <p class="error">{{ errorMessage() }}</p>
+      <div class="error-box">
+        <app-icon name="alert" [size]="20" />
+        <span>{{ errorMessage() }}</span>
+      </div>
     }
+
+    <div class="form-actions">
+      <a appBtn="secondary" icon="close" routerLink="/admin/products">{{ 'common.cancel' | translate }}</a>
+      <button type="submit" appBtn="primary" icon="save" [loading]="submitting()" [disabled]="submitting() || isUploading()">
+        {{ submitting() ? ('admin.addProduct.saving' | translate) : ('admin.addProduct.save' | translate) }}
+      </button>
+    </div>
   </form>
 </section>

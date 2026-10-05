@@ -7,7 +7,6 @@ const TOKEN_KEY = 'supermarket_owner_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Initialized from localStorage so a page refresh doesn't log you out.
   private tokenSignal = signal<string | null>(localStorage.getItem(TOKEN_KEY));
 
   readonly isLoggedIn = signal<boolean>(!!this.tokenSignal());

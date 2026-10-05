@@ -32,8 +32,6 @@ export class AddProductComponent implements OnInit {
   });
 
   ngOnInit() {
-    // Now that category management exists, this replaces the manually
-    // typed Category ID field with a real dropdown of AL-resolved names.
     this.categoryService.listPublic('AL').subscribe({
       next: (categories) => this.categories.set(categories),
       error: () => this.errorMessage.set('Could not load categories.'),

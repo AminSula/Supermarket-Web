@@ -1,0 +1,49 @@
+<div class="admin-shell">
+  <header class="admin-header">
+    <a routerLink="/admin/dashboard" class="brand">
+      <span class="brand-mark"><app-icon name="store" [size]="20" [stroke]="2" /></span>
+      <span class="brand-name">Supermarket</span>
+      <span class="role-pill">{{ 'nav.adminSection' | translate }}</span>
+    </a>
+
+    <div class="controls">
+      <!-- Opens the buyer's view in a new tab so the admin session stays where it is -->
+      <a class="view-store" appBtn="secondary" icon="store" href="/" target="_blank" rel="noopener">
+        {{ 'nav.home' | translate }}
+      </a>
+      <app-toolbar-controls />
+    </div>
+  </header>
+
+  <div class="admin-body">
+    <nav class="sidebar">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" appReveal="left">
+        <app-icon name="dashboard" [size]="19" />
+        <span>{{ 'nav.dashboard' | translate }}</span>
+      </a>
+      <a routerLink="/admin/categories" routerLinkActive="active" appReveal="left" [revealDelay]="60">
+        <app-icon name="categories" [size]="19" />
+        <span>{{ 'nav.categories' | translate }}</span>
+      </a>
+      <a routerLink="/admin/products" routerLinkActive="active" appReveal="left" [revealDelay]="120">
+        <app-icon name="products" [size]="19" />
+        <span>{{ 'nav.products' | translate }}</span>
+      </a>
+      <a routerLink="/admin/orders" routerLinkActive="active" appReveal="left" [revealDelay]="180">
+        <app-icon name="orders" [size]="19" />
+        <span>{{ 'nav.orders' | translate }}</span>
+      </a>
+
+      <div class="spacer"></div>
+
+      <button type="button" class="logout" (click)="logout()">
+        <app-icon name="logout" [size]="19" />
+        <span>{{ 'nav.logout' | translate }}</span>
+      </button>
+    </nav>
+
+    <main>
+      <router-outlet />
+    </main>
+  </div>
+</div>

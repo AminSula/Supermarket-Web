@@ -1,0 +1,59 @@
+<button
+  #trigger
+  type="button"
+  class="trigger"
+  [class.open]="open()"
+  [class.sm]="size() === 'sm'"
+  [class.placeholder]="selectedIndex() < 0"
+  [disabled]="isDisabled()"
+  role="combobox"
+  aria-haspopup="listbox"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="listId"
+  [attr.aria-label]="ariaLabel() || null"
+  [attr.aria-activedescendant]="open() && active() >= 0 ? listId + '-' + active() : null"
+  (click)="toggle()"
+  (keydown)="onKey($event)"
+  (blur)="onBlur()"
+>
+  <span class="label">{{ selectedIndex() >= 0 ? selectedLabel() : placeholder() }}</span>
+  <app-icon class="chevron" name="chevron-down" [size]="18" />
+</button>
+
+<!-- Moved to <body> in ngAfterViewInit so tables/cards can't clip it. -->
+<div
+  #panel
+  class="panel"
+  role="listbox"
+  [id]="listId"
+  [class.open]="open()"
+  [class.up]="placement() === 'up'"
+  [class.sm]="size() === 'sm'"
+  [style.left.px]="pos().left"
+  [style.width.px]="pos().width"
+  [style.top.px]="pos().top"
+  [style.bottom.px]="pos().bottom"
+  [style.maxHeight.px]="pos().maxHeight"
+  (mousedown)="$event.preventDefault()"
+>
+  @for (opt of options(); track $index; let i = $index) {
+    <div
+      class="option"
+      role="option"
+      [id]="listId + '-' + i"
+      [attr.data-i]="i"
+      [class.selected]="i === selectedIndex()"
+      [class.active]="i === active()"
+      [class.disabled]="opt.disabled"
+      [attr.aria-selected]="i === selectedIndex()"
+      [attr.aria-disabled]="opt.disabled || null"
+      (mouseenter)="onHover(i)"
+      (click)="choose(i)"
+    >
+      <span class="text">{{ opt.label }}</span>
+      @if (i === selectedIndex()) {
+        <app-icon name="check" [size]="16" [stroke]="2.2" />
+      }
+    </div>
+  }
+</div>

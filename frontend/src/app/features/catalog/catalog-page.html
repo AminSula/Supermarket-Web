@@ -1,56 +1,106 @@
-<section class="catalog">
-  <h1>{{ 'catalog.title' | translate }}</h1>
+<section class="catalog page-fade-in">
+  <app-page-header icon="store" [title]="'catalog.title' | translate" />
 
   <div class="filters">
-    <input
-      type="text"
-      [(ngModel)]="searchTerm"
-      (keyup.enter)="onFilterChange()"
-      [placeholder]="'catalog.searchPlaceholder' | translate"
+    <div class="control search">
+      <app-icon class="lead" name="search" [size]="18" />
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onFilterChange()"
+        [placeholder]="'catalog.searchPlaceholder' | translate"
+      />
+      @if (searchTerm) {
+        <button type="button" class="clear" aria-label="Clear search" (click)="clearSearch()">
+          <app-icon name="close" [size]="16" />
+        </button>
+      }
+    </div>
+
+    <app-select
+      [options]="categoryOptions()"
+      [(ngModel)]="selectedCategoryId"
+      (ngModelChange)="onFilterChange()"
+      [ariaLabel]="'catalog.allCategories' | translate"
     />
 
-    <select [(ngModel)]="selectedCategoryId" (ngModelChange)="onFilterChange()">
-      <option [ngValue]="null">{{ 'catalog.allCategories' | translate }}</option>
-      @for (category of categories(); track category.id) {
-        <option [ngValue]="category.id">{{ category.name }}</option>
-      }
-    </select>
-
-    <button type="button" (click)="onFilterChange()">{{ 'catalog.search' | translate }}</button>
+    <button type="button" appBtn="primary" icon="search" (click)="onFilterChange()">
+      {{ 'catalog.search' | translate }}
+    </button>
   </div>
 
   @if (loading()) {
-    <p>{{ 'catalog.loading' | translate }}</p>
+    <p class="sr-only">{{ 'catalog.loading' | translate }}</p>
+    <div class="grid">
+      @for (i of skeletonCount; track i) {
+        <div class="card skeleton-card">
+          <app-skeleton height="auto" radius="0" class="skeleton-media" />
+          <div class="body">
+            <app-skeleton height="0.7rem" width="40%" />
+            <app-skeleton height="1rem" width="80%" />
+            <app-skeleton height="1.3rem" width="35%" />
+          </div>
+        </div>
+      }
+    </div>
   } @else if (errorMessage()) {
-    <p class="error">{{ errorMessage() }}</p>
+    <div class="error-box">
+      <app-icon name="alert" [size]="20" />
+      <span>{{ errorMessage() }}</span>
+    </div>
   } @else if (products().length === 0) {
-    <p>{{ 'catalog.noResults' | translate }}</p>
+    <div class="table-card empty-state">
+      <span class="empty-icon"><app-icon name="search" [size]="30" [stroke]="1.5" /></span>
+      <p>{{ 'catalog.noResults' | translate }}</p>
+    </div>
   } @else {
     <div class="grid">
-      @for (product of products(); track product.id) {
-        <button type="button" class="card" (click)="openProduct(product.id)">
-          @if (product.hasImage) {
-            <img class="thumb" [src]="productService.imageUrl(product.id)" alt="" />
-          } @else {
-            <div class="thumb placeholder"></div>
-          }
-          <span class="name">{{ product.name }}</span>
-          <span class="category">{{ product.categoryName }}</span>
-          <span class="price">{{ product.price | number: '1.2-2' }}</span>
-          <span class="add-to-cart" (click)="addToCart($event, product)">
-            {{ 'catalog.addToCart' | translate }}
-          </span>
-        </button>
+      @for (product of products(); track product.id; let i = $index) {
+        <article class="card" [class.oos]="product.stock === 0" appReveal [revealDelay]="(i % 4) * 70">
+          <a class="card-link" [routerLink]="['/products', product.id]">
+            <div class="media">
+              @if (product.imageIds.length > 0) {
+                <img appLazy [src]="productService.imageUrl(product.id, product.imageIds[0])" [alt]="product.name" />
+              } @else {
+                <app-icon name="image" [size]="38" [stroke]="1.3" />
+              }
+              @if (product.stock === 0) {
+                <span class="oos-badge">{{ 'productDetail.outOfStock' | translate }}</span>
+              }
+              @if (product.imageIds.length > 1) {
+                <span class="img-count"><app-icon name="image" [size]="13" />{{ product.imageIds.length }}</span>
+              }
+            </div>
+
+            <div class="body">
+              <span class="category">{{ product.categoryName }}</span>
+              <span class="name">{{ product.name }}</span>
+              <span class="price">{{ product.price | number: '1.2-2' }}</span>
+            </div>
+          </a>
+
+          <div class="actions">
+            <button
+              type="button"
+              [appBtn]="addedId() === product.id ? 'secondary' : 'primary'"
+              [icon]="addedId() === product.id ? 'check' : 'cart'"
+              [disabled]="product.stock === 0"
+              (click)="addToCart(product)"
+            >
+              {{ (addedId() === product.id ? 'productDetail.added' : 'catalog.addToCart') | translate }}
+            </button>
+          </div>
+        </article>
       }
     </div>
 
     @if (totalPages() > 1) {
       <div class="pagination">
-        <button type="button" [disabled]="page() === 0" (click)="goToPage(page() - 1)">
+        <button type="button" appBtn="secondary" icon="chevron-left" [disabled]="page() === 0" (click)="goToPage(page() - 1)">
           {{ 'catalog.previous' | translate }}
         </button>
-        <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-        <button type="button" [disabled]="page() >= totalPages() - 1" (click)="goToPage(page() + 1)">
+        <span class="page-pill">{{ page() + 1 }} / {{ totalPages() }}</span>
+        <button type="button" appBtn="secondary" icon="chevron-right" [disabled]="page() >= totalPages() - 1" (click)="goToPage(page() + 1)">
           {{ 'catalog.next' | translate }}
         </button>
       </div>

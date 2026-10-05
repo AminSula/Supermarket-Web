@@ -1,14 +1,27 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CategoryService } from '../../../core/services/category.service';
+import { ButtonComponent } from '../../../shared/button/button';
+import { IconComponent } from '../../../shared/icon/icon';
+import { PageHeaderComponent } from '../../../shared/page-header/page-header';
+import { RevealDirective } from '../../../shared/reveal/reveal';
 
 @Component({
   selector: 'app-category-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    TranslateModule,
+    ButtonComponent,
+    IconComponent,
+    PageHeaderComponent,
+    RevealDirective,
+  ],
   templateUrl: './category-form.html',
   styleUrl: './category-form.scss',
 })
@@ -30,7 +43,7 @@ export class CategoryFormComponent implements OnInit {
   ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (!idParam) {
-      return; // create mode
+      return; 
     }
 
     const id = Number(idParam);
@@ -44,6 +57,16 @@ export class CategoryFormComponent implements OnInit {
       },
       error: () => this.errorMessage.set('Could not load this category.'),
     });
+  }
+
+  invalid(name: string): boolean {
+    const control = this.form.get(name);
+    return !!control && control.invalid && control.touched;
+  }
+
+  ok(name: string): boolean {
+    const control = this.form.get(name);
+    return !!control && control.valid && control.dirty;
   }
 
   submit() {

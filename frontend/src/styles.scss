@@ -1,32 +1,590 @@
+// ============================================================================
+// Design system — "Ocean" palette
+// ============================================================================
+
 :root,
 [data-theme='light'] {
-  --bg: #f7f7f8;
+  color-scheme: light;
+
+  // Surfaces & text
+  --bg: #f3f7fc;
   --surface: #ffffff;
-  --text: #1a1a1a;
-  --text-muted: #6b6b6b;
-  --border: #e2e2e4;
-  --accent: #2f6f4f;
+  --surface-2: #eaf1f9; 
+  --text: #0e1e33;
+  --text-muted: #5a6e86;
+  --border: #dae4f0;
+
+  // Accent — ocean blue
+  --accent: #0a6fd8;
+  --accent-hover: #0859b3;
   --accent-contrast: #ffffff;
+  --accent-soft: #e1eefc; 
+  --accent-gradient: linear-gradient(135deg, #0a6fd8 0%, #17a2e6 100%);
+  --ring: rgba(10, 111, 216, 0.28); 
+
+  // Status
+  --danger: #d64545;
+  --danger-soft: rgba(214, 69, 69, 0.1);
+  --on-danger: #ffffff; 
+  --success: #12a06e;
+  --success-soft: rgba(18, 160, 110, 0.12);
+  --warning: #d98a0b;
+  --warning-soft: rgba(217, 138, 11, 0.14);
+
+  // Elevation (blue-tinted)
+  --shadow: 0 1px 2px rgba(14, 30, 51, 0.04), 0 4px 14px rgba(14, 30, 51, 0.06);
+  --shadow-hover: 0 2px 4px rgba(14, 30, 51, 0.05), 0 14px 32px rgba(10, 80, 160, 0.14);
+
+  // Skeleton shimmer
+  --skeleton-base: #e4ecf6;
+  --skeleton-shine: #f3f8fe;
 }
 
 [data-theme='dark'] {
-  --bg: #121212;
-  --surface: #1c1c1e;
-  --text: #f0f0f0;
-  --text-muted: #a0a0a0;
-  --border: #2e2e30;
-  --accent: #4caf7d;
-  --accent-contrast: #0c0c0c;
+  color-scheme: dark;
+
+  --bg: #08111f;
+  --surface: #0f1d31;
+  --surface-2: #162842;
+  --text: #e8f0fa;
+  --text-muted: #8fa4be;
+  --border: #1d3250;
+
+  --accent: #4aa3ff;
+  --accent-hover: #7bbcff;
+  --accent-contrast: #05172b;
+  --accent-soft: #11304f;
+  --accent-gradient: linear-gradient(135deg, #2f8df2 0%, #4cc6f6 100%);
+  --ring: rgba(74, 163, 255, 0.35);
+
+  --danger: #ff7b7b;
+  --danger-soft: rgba(255, 123, 123, 0.14);
+  --on-danger: #2a0a0a;
+  --success: #3fd49b;
+  --success-soft: rgba(63, 212, 155, 0.14);
+  --warning: #f2b34a;
+  --warning-soft: rgba(242, 179, 74, 0.16);
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.28);
+  --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.35), 0 16px 36px rgba(0, 0, 0, 0.45);
+
+  --skeleton-base: #14253d;
+  --skeleton-shine: #1d3453;
+}
+
+// Theme-independent tokens
+:root {
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  // Motion
+  --ease: cubic-bezier(0.22, 1, 0.36, 1); 
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); 
+  --dur-fast: 0.16s;
+  --dur: 0.28s;
+  --dur-slow: 0.5s;
+
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--dur) ease, color var(--dur) ease;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+p {
+  color: var(--text-muted);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+// Consistent, accessible focus ring everywhere 
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+// Every button and link gets a consistent, quick transition by default —
+// individual components can still override.
+button,
+a {
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease, transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease), opacity var(--dur-fast) ease;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+// Subtle press feedback on all enabled buttons.
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+// Inputs: soft focus glow instead of the browser default.
+input,
+select,
+textarea {
+  font-family: inherit;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease,
+    background-color var(--dur-fast) ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+}
+
+// Slim, themed scrollbars.
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--bg);
+}
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+
+// Entrance animation for top-level pages
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-fade-in {
+  animation: page-fade-in var(--dur-slow) var(--ease) backwards;
+}
+
+// Shared shimmer for skeleton loading placeholders 
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Respect users who prefer less motion — disables every animation/transition.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+// ============================================================================
+// Shared UI kit — used by admin lists/forms (and reused by later pages)
+// ============================================================================
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// --- Messages & empty states ---------------------------------------------------
+.error-box {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 0.92rem;
+  font-weight: 500;
+  animation: slide-down 0.3s var(--ease) both;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+
+  .empty-icon {
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    border-radius: 22px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+}
+
+.skeleton-rows {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.1rem;
+}
+
+// --- Tables --------------------------------------------------------------------
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+
+  th {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.8rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    transition: background-color var(--dur-fast) ease;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .actions-cell {
+    text-align: right;
+    white-space: nowrap;
+
+    > * + * {
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.22rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.success {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+  &.warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+  &.danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+  &.info {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+}
+
+// --- Forms ---------------------------------------------------------------------
+.form-card {
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+
+  .full {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--border);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+// The input "shell"
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  }
+
+  &:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+
+  input,
+  textarea {
+    flex: 1;
+    min-width: 0;
+    padding: 0.7rem 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.95rem;
+    outline: none;
+
+    &:focus {
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+  }
+
+  textarea {
+    min-height: 92px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  &.area {
+    align-items: flex-start;
+
+    .lead {
+      margin-top: 0.8rem;
+    }
+  }
+
+  .lead {
+    color: var(--text-muted);
+    transition: color var(--dur-fast) ease;
+  }
+
+  &:focus-within .lead {
+    color: var(--accent);
+  }
+
+  .prefix {
+    padding: 0.18rem 0.45rem;
+    border-radius: 7px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .ok {
+    color: var(--success);
+    animation: pop-in 0.35s var(--ease-spring) both;
+  }
+}
+
+.field.invalid .control {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+  animation: shake 0.4s var(--ease);
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 500;
+  animation: slide-down 0.25s var(--ease) both;
+}
+
+//number fields
+input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }

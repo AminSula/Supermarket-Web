@@ -1,43 +1,67 @@
-<section class="category-list">
-  <div class="header">
-    <h1>{{ 'admin.categories.title' | translate }}</h1>
-    <a routerLink="/admin/categories/new" class="btn">{{ 'admin.categories.add' | translate }}</a>
-  </div>
+<section class="category-list page-fade-in">
+  <app-page-header icon="categories" [title]="'admin.categories.title' | translate">
+    <a appBtn="primary" icon="plus" routerLink="/admin/categories/new">
+      {{ 'admin.categories.add' | translate }}
+    </a>
+  </app-page-header>
 
   @if (loading()) {
-    <p>{{ 'admin.categories.loading' | translate }}</p>
-  } @else if (categories().length === 0) {
-    <p>{{ 'admin.categories.empty' | translate }}</p>
-  } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>{{ 'admin.categories.nameAl' | translate }}</th>
-          <th>{{ 'admin.categories.nameEn' | translate }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (category of categories(); track category.id) {
-          <tr>
-            <td>{{ nameFor(category, 'AL') }}</td>
-            <td>{{ nameFor(category, 'EN') }}</td>
-            <td class="actions">
-              <a [routerLink]="['/admin/categories', category.id, 'edit']">
-                {{ 'admin.categories.edit' | translate }}
-              </a>
-              <button type="button" (click)="askDelete(category.id)">
-                {{ 'admin.categories.delete' | translate }}
-              </button>
-            </td>
-          </tr>
+    <p class="sr-only">{{ 'admin.categories.loading' | translate }}</p>
+    <div class="table-card">
+      <div class="skeleton-rows">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <app-skeleton height="46px" radius="12px" />
         }
-      </tbody>
-    </table>
+      </div>
+    </div>
+  } @else if (categories().length === 0) {
+    <div class="table-card empty-state">
+      <span class="empty-icon"><app-icon name="categories" [size]="30" [stroke]="1.5" /></span>
+      <p>{{ 'admin.categories.empty' | translate }}</p>
+      <a appBtn="primary" icon="plus" routerLink="/admin/categories/new">
+        {{ 'admin.categories.add' | translate }}
+      </a>
+    </div>
+  } @else {
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'admin.categories.nameAl' | translate }}</th>
+            <th>{{ 'admin.categories.nameEn' | translate }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (category of categories(); track category.id; let i = $index) {
+            <tr appReveal="fade" [revealDelay]="i < 12 ? i * 45 : 0">
+              <td>
+                <div class="cell-name">
+                  <span class="row-icon"><app-icon name="tag" [size]="17" /></span>
+                  <span>{{ nameFor(category, 'AL') }}</span>
+                </div>
+              </td>
+              <td>{{ nameFor(category, 'EN') }}</td>
+              <td class="actions-cell">
+                <a appBtn="edit" icon="edit" [routerLink]="['/admin/categories', category.id, 'edit']">
+                  {{ 'admin.categories.edit' | translate }}
+                </a>
+                <button type="button" appBtn="delete" icon="trash" (click)="askDelete(category.id)">
+                  {{ 'admin.categories.delete' | translate }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 
   @if (errorMessage()) {
-    <p class="error">{{ errorMessage() }}</p>
+    <div class="error-box">
+      <app-icon name="alert" [size]="20" />
+      <span>{{ errorMessage() }}</span>
+    </div>
   }
 </section>
 
